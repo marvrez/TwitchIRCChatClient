@@ -19,14 +19,15 @@ public:
 
 public slots:
     void addTab();
-    void channelChanged();
+    void channelChanged(int index);
 
 private slots:
     void on_tabWidget_tabCloseRequested(int index);
-    void addTab(QString channel); //only for debugging
+    void addTab(const QString channel); //only for debugging
 
 private:
     Ui::MainWindow *ui;
+    QString curChannel;
 };
 
 #endif // MAINWINDOW_H

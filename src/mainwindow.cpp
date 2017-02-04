@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "ircmanager.h"
+#include "Messages/message.h"
 
 #include <QDesktopServices>
 #include <QDebug>
@@ -44,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->tabBar()->tabButton(0,QTabBar::LeftSide)->resize(0,0);
     ui->tabWidget->setTabsClosable(true);
 
-    addTab("#imaqtpie");
+    qDebug() << "LUL";
     //ui->tabWidget->setMovable(true);
 }
 
@@ -55,20 +56,26 @@ MainWindow::~MainWindow() {
 void MainWindow::connectToIrc() {
     read.connect();
     write.connect();
+    addTab("#imaqtpie");
     //TODO: IMPLEMENT
 }
 
 void MainWindow::onMessageReceived(IrcPrivateMessage *message) {
-    qDebug() << message->toData();
+    QList<Message*> *messages = read.getMessages(message->target());
+
+    int maxMessages = 150; //twitch default
+    Message *newMessage = Message::onMessage(message);
+    messages->append(newMessage);
+    qDebug() << newMessage->raw_message;
 }
 
 void MainWindow::addTab() {
-    QLabel *tab = new QLabel(this);
     bool ok;
     QString text = QInputDialog::getText(this, tr("Enter channelname"),
                                          tr("Channel:"), QLineEdit::Normal,
                                          QDir::home().dirName(), &ok);
     if (ok && !text.isEmpty()) {
+        QLabel *tab = new QLabel(this);
         QString tabName = QString(text);
         for(int i = 0; i < ui->tabWidget->count(); ++i) {
             if (ui->tabWidget->tabText(i) == tabName)
@@ -76,27 +83,36 @@ void MainWindow::addTab() {
         }
         QString ircUserName = (tabName.startsWith("#")) ? tabName.toLower() : "#" + tabName.toLower();
         if(write.joinChannel(&ircUserName) && read.joinChannel(&ircUserName))
-            ui->tabWidget->insertTab( ui->tabWidget->count() - 1, tab, tabName);
+            ui->tabWidget->insertTab(ui->tabWidget->count() - 1, tab, tabName);
+        ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 2);
+        channelChanged(ui->tabWidget->count() - 2);
     }
     //TODO: ADD JOIN CHANNEL
 }
 
 void MainWindow::addTab(const QString channel) {
+    if(write.joinChannel(&channel) && read.joinChannel(&channel)) {
         QLabel *tab = new QLabel(this);
-        if(write.joinChannel(&channel) && read.joinChannel(&channel))
-            ui->tabWidget->insertTab( ui->tabWidget->count() - 1, tab, channel);
+        ui->tabWidget->insertTab( ui->tabWidget->count() - 1, tab, channel.mid(1));
+        ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 2);
+        channelChanged(ui->tabWidget->count() -2 );
+    }
 }
 
 void MainWindow::on_tabWidget_tabCloseRequested(int index) {
     if(ui->tabWidget->count() > 1 && index != ui->tabWidget->count()-1) {
-        IrcCommand *part =  IrcCommand::createPart(ui->tabWidget->tabText(index));
-        write.sendCommand(part);
-        read.sendCommand(part);
+        QString channelName = ui->tabWidget->tabText(index);
+
+        write.removeChannel(channelName);
+        read.removeChannel(channelName);
+
+        this->curChannel = (ui->tabWidget->count() == 2) ? "" : ui->tabWidget->tabText(index - 1);
         ui->tabWidget->removeTab(index);
     }
     //TODO: also delete widget?
 }
 
-void MainWindow::channelChanged() {
-
+void MainWindow::channelChanged(int index) {
+    this->curChannel =  ui->tabWidget->tabText(index);
+    qDebug() <<  this->curChannel;
 }

@@ -42,6 +42,18 @@ const QSet<QString>* IrcManager::getChannels() const {
     return &this->channels;
 }
 
-void IrcManager::getMessages() {
-    //this->rec
+bool IrcManager::removeChannel(QString channelName) {
+    channelName = (channelName.startsWith("#")) ? channelName.toLower() : "#" + channelName.toLower();
+    this->channels.remove(channelName.toLower());
+    IrcCommand *part =  IrcCommand::createPart(channelName);
+    qDebug() << "Left channel:" << channelName;
+    return this->sendCommand(part);
+}
+
+QList<Message*>* IrcManager::getMessages(const QString &channelName) {
+    if(!this->messages.contains(channelName))
+        this->messages.insert(channelName, QList<Message*>());
+
+    QList<Message*> *messages = &this->messages[channelName];
+    return messages;
 }

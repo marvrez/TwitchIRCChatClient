@@ -1,6 +1,8 @@
 #ifndef IRCMANAGER_H
 #define IRCMANAGER_H
 
+#include "Messages/message.h"
+
 #include <QMap>
 #include <QSet>
 #include <QObject>
@@ -19,12 +21,13 @@ public:
     void connect();
     bool joinChannel(const QString *channelName);
     bool isInChannel(const QString *channelName);
+    bool removeChannel(QString channelName);
     const QSet<QString>* getChannels() const;
-    void getMessages();
+    QList<Message*>* getMessages(const QString &channelName);
 
 private:
     QSet<QString> channels;
-    QMap<QString, QList<QString*>> messages;
+    QMap<QString, QList<Message*>> messages; //key:channel, value: messages
 };
 
 #endif // IRCMANAGER_H

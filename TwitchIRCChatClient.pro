@@ -30,7 +30,8 @@ HEADERS  += src/mainwindow.h \
     src/LoginWindow/loginwindow.h \
     src/ircmanager.h \
     src/LoginWindow/browswerwindow.h \
-    src/Messages/message.h
+    src/Messages/message.h \
+    src/Messages/mentionmanager.h
 
 RESOURCES += lib/QDarkStyleSheet/qdarkstyle/style.qrc \
              resources/loginwindow.qrc \
