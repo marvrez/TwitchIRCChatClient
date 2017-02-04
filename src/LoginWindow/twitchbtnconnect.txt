@@ -1,0 +1,2 @@
+https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id=hmcgc5sv91fyzjsj5ekostolzcxkcg&
+redirect_uri=https%3A%2F%2Ftwitch.tv%2Fdeiityy&scope=user_read+channel_read
