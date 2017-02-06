@@ -2,7 +2,7 @@
 
 
 Message* Message::onMessage(IrcPrivateMessage *message) {
-    Message* msg = new Message();
+    Message *msg = new Message();
 
     //set raw message
     msg->raw_message = QString(message->toData());

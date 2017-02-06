@@ -17,6 +17,7 @@ void IrcManager::connect() {
     this->setNickName(settings.value("Credentials/username", "realKKona123").toString());
     this->setRealName("Twitch User");
 
+
     this->sendCommand(IrcCommand::createCapability("REQ","twitch.tv/membership"));
     this->sendCommand(IrcCommand::createCapability("REQ", "twitch.tv/commands"));
     this->sendCommand(IrcCommand::createCapability("REQ", "twitch.tv/tags"));

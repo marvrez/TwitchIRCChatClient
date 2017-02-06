@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "ircmanager.h"
 #include "Messages/message.h"
+#include "ChatWidget/chatwidget.h"
 
 #include <QDesktopServices>
 #include <QDebug>
@@ -19,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    QMainWindow::centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
+    this->setWindowTitle("Twitch chat client");
 
     QObject::connect(&read,
                      &IrcConnection::privateMessageReceived,
@@ -32,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QToolButton *tb = new QToolButton(this);
     tb->setText("+");
     tb->setAutoRaise(true);
-    connect(tb,
+    QObject::connect(tb,
             SIGNAL(clicked()),
             this,
             SLOT(addTab()));
@@ -45,7 +48,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->tabBar()->tabButton(0,QTabBar::LeftSide)->resize(0,0);
     ui->tabWidget->setTabsClosable(true);
 
-    qDebug() << "LUL";
     //ui->tabWidget->setMovable(true);
 }
 
@@ -56,7 +58,6 @@ MainWindow::~MainWindow() {
 void MainWindow::connectToIrc() {
     read.connect();
     write.connect();
-    addTab("#imaqtpie");
     //TODO: IMPLEMENT
 }
 
@@ -66,7 +67,8 @@ void MainWindow::onMessageReceived(IrcPrivateMessage *message) {
     int maxMessages = 150; //twitch default
     Message *newMessage = Message::onMessage(message);
     messages->append(newMessage);
-    qDebug() << newMessage->raw_message;
+    if(message->target() == this->curChannel)
+        qDebug() << newMessage->raw_message;
 }
 
 void MainWindow::addTab() {
@@ -75,28 +77,22 @@ void MainWindow::addTab() {
                                          tr("Channel:"), QLineEdit::Normal,
                                          QDir::home().dirName(), &ok);
     if (ok && !text.isEmpty()) {
-        QLabel *tab = new QLabel(this);
-        QString tabName = QString(text);
-        for(int i = 0; i < ui->tabWidget->count(); ++i) {
-            if (ui->tabWidget->tabText(i) == tabName)
-                return;
-        }
-        QString ircUserName = (tabName.startsWith("#")) ? tabName.toLower() : "#" + tabName.toLower();
+        QString ircUserName = (text.startsWith("#")) ? text.toLower() : "#" + text.toLower();
         if(write.joinChannel(&ircUserName) && read.joinChannel(&ircUserName))
-            ui->tabWidget->insertTab(ui->tabWidget->count() - 1, tab, tabName);
+            ui->tabWidget->insertTab(ui->tabWidget->count() - 1, new ChatWidget(this), text);
         ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 2);
         channelChanged(ui->tabWidget->count() - 2);
     }
-    //TODO: ADD JOIN CHANNEL
 }
 
 void MainWindow::addTab(const QString channel) {
-    if(write.joinChannel(&channel) && read.joinChannel(&channel)) {
+    QString ircUserName = (channel.startsWith("#")) ? channel.toLower() : "#" + channel.toLower();
+    if(read.joinChannel(&ircUserName) && write.joinChannel(&ircUserName)) {
         QLabel *tab = new QLabel(this);
-        ui->tabWidget->insertTab( ui->tabWidget->count() - 1, tab, channel.mid(1));
-        ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 2);
-        channelChanged(ui->tabWidget->count() -2 );
-    }
+            ui->tabWidget->insertTab(ui->tabWidget->count() - 1, tab, channel.mid(1));
+            ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 2);
+            channelChanged(ui->tabWidget->count() - 2);
+        }
 }
 
 void MainWindow::on_tabWidget_tabCloseRequested(int index) {
@@ -107,12 +103,14 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index) {
         read.removeChannel(channelName);
 
         this->curChannel = (ui->tabWidget->count() == 2) ? "" : ui->tabWidget->tabText(index - 1);
+        ui->tabWidget->widget(index)->close();
         ui->tabWidget->removeTab(index);
+        ui->tabWidget->setCurrentIndex(index-1);
     }
     //TODO: also delete widget?
 }
 
 void MainWindow::channelChanged(int index) {
-    this->curChannel =  ui->tabWidget->tabText(index);
+    this->curChannel = "#" + ui->tabWidget->tabText(index);
     qDebug() <<  this->curChannel;
 }

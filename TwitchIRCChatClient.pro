@@ -24,21 +24,27 @@ SOURCES += src/main.cpp\
     src/LoginWindow/loginwindow.cpp \
     src/ircmanager.cpp \
     src/LoginWindow/browswerwindow.cpp \
-    src/Messages/message.cpp
+    src/Messages/message.cpp \
+    src/ChatWidget/chatwidget.cpp
 
 HEADERS  += src/mainwindow.h \
     src/LoginWindow/loginwindow.h \
     src/ircmanager.h \
     src/LoginWindow/browswerwindow.h \
     src/Messages/message.h \
-    src/Messages/mentionmanager.h
+    src/Messages/mentionmanager.h \
+    src/ChatWidget/chatwidget.h \
+    src/ChatWidget/chatpage.h
 
 RESOURCES += lib/QDarkStyleSheet/qdarkstyle/style.qrc \
              resources/loginwindow.qrc \
+             src/ChatWidget/chatwindow.qrc \
+    src/ChatWidget/chatwindow.qrc
              #main.qrc
 
 FORMS    += src/ui/mainwindow.ui \
     src/ui/loginwindow.ui \
+    src/ChatWidget/chatwidget.ui
 
 DISTFILES += \
-    src/LoginWindow/twitchbtnconnect.txt
+    src/LoginWindow/twitchbtnconnect.txt \

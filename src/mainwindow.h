@@ -15,6 +15,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     void connectToIrc();
     void onMessageReceived(IrcPrivateMessage *message);
+    void addTab(const QString channel); //only for debugging
     ~MainWindow();
 
 public slots:
@@ -23,7 +24,6 @@ public slots:
 
 private slots:
     void on_tabWidget_tabCloseRequested(int index);
-    void addTab(const QString channel); //only for debugging
 
 private:
     Ui::MainWindow *ui;
