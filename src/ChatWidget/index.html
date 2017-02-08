@@ -1,8 +1,73 @@
+<!DOCTYPE html>
 <html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <style type="text/css">
+			html,
+			body {
+			    color: silver;
+			    background-color: rgb(48, 47, 47);
+			    background-clip: border;
+			    border-image: none;
+			    outline: 0;
+			    font-family: Helvetica Neue, Helvetica, sans-serif;
+			    font-size: 12px;
+			    padding: 0px;
+			    margin: 5px;
+			}
+
+			.message {
+			    width: 100%;
+			    padding: 5px;
+			    display: block;
+			    overflow: hidden;
+			    position: relative;
+			    word-wrap: break-word;
+			}
+
+			.message:nth-child(2n) {
+			    background: rgb(40, 39, 39);
+			}
+
+			.message.action .colon {
+			    display: none;
+			}
+
+			.message.action .content {
+			    padding-left: 3px;
+			}
+
+			.message .colon {
+			    padding-right: 3px;
+			}
+
+			a {
+			    color: #999;
+			    text-decoration: none;
+			}
+
+			.username {
+			    font-weight: bold;
+			}
+
+			.message[data-mention="default"] {
+			    background-color: rgba(255, 0, 0, .4) !important;
+			} 
+        </style>
+    </head>
+    <script type="text/javascript">
+var height = 0;
+$('div p').each(function(i, value){
+    height += parseInt($(this).height());
+});
+
+height += '';
+
+$('div').animate({scrollTop: height});
+    </script>
     <body>
-
         <p><a href="http://www.w3schools.com/html/">Visit our HTML tutorial</a></p>
-
+        <p> LUL HEY GUYS </p>
     </body>
 </html>
 

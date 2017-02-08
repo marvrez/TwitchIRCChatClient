@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QSettings>
 #include <QCheckBox>
-#include <QWebEngineView>
+#include <QWebView>
 #include <QDebug>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -38,7 +38,7 @@ private:
     const QString clientID = QString("hmcgc5sv91fyzjsj5ekostolzcxkcg");
     const QString redirectURL = QString("https://twitch.tv/deiityy");
     QNetworkAccessManager network_access_manager;
-    QWebEngineView *webView;
+    QWebView *webView;
     bool finished = false;
 
     void changeState(bool state);

@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "ChatWidget/chatwidget.h"
+
 #include <QMainWindow>
 #include <IrcMessage>
 namespace Ui {
@@ -28,6 +30,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QString curChannel;
+    ChatWidget *curChatWidget;
+    QMap <QString, ChatWidget*> chatWindows;
 };
 
 #endif // MAINWINDOW_H

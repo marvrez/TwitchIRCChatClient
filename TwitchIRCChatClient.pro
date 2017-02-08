@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webengine webenginewidgets
+QT       += core gui webkitwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -23,7 +23,6 @@ SOURCES += src/main.cpp\
         src/mainwindow.cpp \
     src/LoginWindow/loginwindow.cpp \
     src/ircmanager.cpp \
-    src/LoginWindow/browswerwindow.cpp \
     src/Messages/message.cpp \
     src/ChatWidget/chatwidget.cpp
 
@@ -33,8 +32,7 @@ HEADERS  += src/mainwindow.h \
     src/LoginWindow/browswerwindow.h \
     src/Messages/message.h \
     src/Messages/mentionmanager.h \
-    src/ChatWidget/chatwidget.h \
-    src/ChatWidget/chatpage.h
+    src/ChatWidget/chatwidget.h
 
 RESOURCES += lib/QDarkStyleSheet/qdarkstyle/style.qrc \
              resources/loginwindow.qrc \

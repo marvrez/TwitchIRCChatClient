@@ -7,11 +7,14 @@
 #include <QDesktopServices>
 #include <QDebug>
 #include <QTextDocumentFragment>
-#include <QtWebEngine>
+#include <QWebElement>
 #include <QToolButton>
 #include <QLabel>
 #include <QTabWidget>
+#include <QScrollBar>
 #include <QInputDialog>
+#include <QTabWidget>
+#include <QDir>
 
 IrcManager write, read;
 
@@ -63,12 +66,15 @@ void MainWindow::connectToIrc() {
 
 void MainWindow::onMessageReceived(IrcPrivateMessage *message) {
     QList<Message*> *messages = read.getMessages(message->target());
+    //QtWebEngine::
 
     int maxMessages = 150; //twitch default
     Message *newMessage = Message::onMessage(message);
     messages->append(newMessage);
-    if(message->target() == this->curChannel)
-        qDebug() << newMessage->raw_message;
+    if(message->target() == this->curChannel) {
+        chatWindows[this->curChannel]->updateMessageScreen(messages);
+        chatWindows[this->curChannel]->addMessage(newMessage);
+    }
 }
 
 void MainWindow::addTab() {
@@ -78,9 +84,13 @@ void MainWindow::addTab() {
                                          QDir::home().dirName(), &ok);
     if (ok && !text.isEmpty()) {
         QString ircUserName = (text.startsWith("#")) ? text.toLower() : "#" + text.toLower();
-        if(write.joinChannel(&ircUserName) && read.joinChannel(&ircUserName))
-            ui->tabWidget->insertTab(ui->tabWidget->count() - 1, new ChatWidget(this), text);
-        ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 2);
+
+        if(write.joinChannel(&ircUserName) && read.joinChannel(&ircUserName)){
+            if(!chatWindows.contains(ircUserName)) chatWindows[ircUserName] = new ChatWidget(this);
+            this->ui->tabWidget->insertTab(ui->tabWidget->count() - 1, chatWindows[ircUserName], text);
+        }
+
+        this->ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 2);
         channelChanged(ui->tabWidget->count() - 2);
     }
 }
@@ -112,5 +122,7 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index) {
 
 void MainWindow::channelChanged(int index) {
     this->curChannel = "#" + ui->tabWidget->tabText(index);
+
+    chatWindows[this->curChannel]->channelChanged(read.getMessages(this->curChannel));
     qDebug() <<  this->curChannel;
 }

@@ -51,6 +51,10 @@ bool IrcManager::removeChannel(QString channelName) {
     return this->sendCommand(part);
 }
 
+void IrcManager::sendMessage(const QString &channel, const QString &message) {
+    this->sendCommand(IrcCommand::createMessage(channel, message));
+}
+
 QList<Message*>* IrcManager::getMessages(const QString &channelName) {
     if(!this->messages.contains(channelName))
         this->messages.insert(channelName, QList<Message*>());

@@ -16,6 +16,9 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="acceptDrops">
+   <bool>false</bool>
+  </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
@@ -26,7 +29,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QWebEngineView" name="chatWindow" native="true"/>
+      <widget class="QWebView" name="chatWindow" native="true"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -42,8 +45,29 @@
        </item>
        <item>
         <widget class="QPushButton" name="wSend">
+         <property name="sizeIncrement">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
-          <string>Send</string>
+          <string>Chat</string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>17</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="autoRepeat">
+          <bool>false</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
+         </property>
+         <property name="autoRepeatDelay">
+          <number>299</number>
          </property>
          <property name="autoDefault">
           <bool>false</bool>
@@ -61,10 +85,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QWebEngineView</class>
+   <class>QWebView</class>
    <extends>QWidget</extends>
-   <header location="global">qwebengineview.h</header>
-   <container>1</container>
+   <header location="global">QtWebKitWidgets/QWebView</header>
   </customwidget>
  </customwidgets>
  <resources/>

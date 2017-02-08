@@ -2,10 +2,8 @@
 #include "ui_loginwindow.h"
 
 #include <QtCore>
-#include <QWebEngineView>
-#include <QWebEngineProfile>
-#include <QWebEngineUrlRequestInterceptor>
-
+#include <QWebView>
+#include <QWebSettings>
 #define API_VERSION 5
 
 LoginWindow::LoginWindow(QWidget *parent) :
@@ -15,7 +13,8 @@ LoginWindow::LoginWindow(QWidget *parent) :
 
     this->setWindowTitle("Login");
 
-    webView = new QWebEngineView;
+    webView = new QWebView;
+    QWebSettings::clearMemoryCaches;
 
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "marvin", "chat");
     this->ui->cbAutoConnect->setChecked(settings.value("Main/auto_connect", false).toBool());
@@ -51,17 +50,18 @@ void LoginWindow::on_btnTwitchLogin_clicked(){
                              "&redirect_uri=%2"
                              "&scope=user_read+chat_login"
                              "&force_verify=true").arg(clientID, redirectURL));
-     //qDebug() << url;
+     qDebug() << url;
      webView->load(url);
      webView->setWindowTitle("Login with Twitch");
      webView->show();
 
-     QObject::connect(webView, &QWebEngineView::urlChanged, [&]() {
+     QObject::connect(webView, &QWebView::urlChanged, [&]() {
          qDebug() << "Url being viewed:" << webView->url();
          QRegularExpression url_regex = QRegularExpression("\\b(https|http):\/\/www.twitch.tv\/deiityy");
          QRegularExpression oauth_regex = QRegularExpression("(access_token=?)([a-z0-9]*)");
 
          if(url_regex.match(webView->url().toString()).hasMatch()) {
+                qDebug() << "LUL";
                 webView->close();
                 if(oauth_regex.match(webView->url().toString()).hasMatch()) {
                      QString raw_oauth(oauth_regex.match(webView->url().toString()).captured());
@@ -92,7 +92,6 @@ void LoginWindow::on_btnTwitchLogin_clicked(){
                 }
          }
      });
-     //webView->deleteLater();
 }
 
 void LoginWindow::on_cbAutoConnect_stateChanged(int state)

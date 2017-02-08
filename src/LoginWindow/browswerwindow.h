@@ -1,7 +1,7 @@
 #ifndef BROWSWERWINDOW_H
 #define BROWSWERWINDOW_H
 
-#include <QWebEngineView>
+#include <QWebView>
 
 class BrowswerWindow : QWidget
 {
