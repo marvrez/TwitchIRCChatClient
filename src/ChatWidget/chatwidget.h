@@ -19,6 +19,7 @@ public:
     explicit ChatWidget(QWidget *parent = 0);
     //bool acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame);
     void addMessage(Message *msg);
+    void setChannel(const QString &channel);
     void linkClicked(const QUrl &url);
     int scrollValue;
     bool autoScroll;
@@ -33,6 +34,7 @@ private slots:
 private:
     Ui::ChatWidget *ui;
     int messageCount = 150;
+    QString channel;
     void chatContentsSizeChanged(const QSize &size);
 };
 

@@ -16,7 +16,8 @@
 #include <QTabWidget>
 #include <QDir>
 
-IrcManager write, read;
+IrcManager MainWindow::write;
+IrcManager MainWindow::read;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     QMainWindow::centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
     this->setWindowTitle("Twitch chat client");
-
+    //this->ui->tabWidget->setStyleSheet("background-color: #6441A4");
     QObject::connect(&read,
                      &IrcConnection::privateMessageReceived,
                      this,
@@ -66,7 +67,6 @@ void MainWindow::connectToIrc() {
 
 void MainWindow::onMessageReceived(IrcPrivateMessage *message) {
     QList<Message*> *messages = read.getMessages(message->target());
-    //QtWebEngine::
 
     int maxMessages = 150; //twitch default
     Message *newMessage = Message::onMessage(message);
@@ -87,7 +87,8 @@ void MainWindow::addTab() {
 
         if(write.joinChannel(&ircUserName) && read.joinChannel(&ircUserName)){
             if(!chatWindows.contains(ircUserName)) chatWindows[ircUserName] = new ChatWidget(this);
-            this->ui->tabWidget->insertTab(ui->tabWidget->count() - 1, chatWindows[ircUserName], text);
+            chatWindows[ircUserName]->setChannel(ircUserName);
+            this->ui->tabWidget->insertTab(ui->tabWidget->count() - 1, chatWindows[ircUserName], text.toLower());
         }
 
         this->ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 2);

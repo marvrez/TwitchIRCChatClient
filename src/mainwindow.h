@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "ChatWidget/chatwidget.h"
+#include "ircmanager.h"
 
 #include <QMainWindow>
 #include <IrcMessage>
@@ -19,6 +20,8 @@ public:
     void onMessageReceived(IrcPrivateMessage *message);
     void addTab(const QString channel); //only for debugging
     ~MainWindow();
+
+    static IrcManager write, read;
 
 public slots:
     void addTab();

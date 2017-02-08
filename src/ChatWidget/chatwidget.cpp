@@ -1,5 +1,6 @@
 #include "chatwidget.h"
 #include "ui_chatwidget.h"
+#include "mainwindow.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -7,6 +8,9 @@
 #include <QWebFrame>
 #include <QWebElement>
 #include <QScrollBar>
+#include <QMainWindow>
+#include <QLineEdit>
+#include <QPushButton>
 
 ChatWidget::ChatWidget(QWidget *parent) :
     QDialog(parent),
@@ -14,6 +18,7 @@ ChatWidget::ChatWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     this->layout()->setContentsMargins(0,0,0,0);
+    this->ui->wSend->setStyleSheet(("background-color: #6441A4"));
     this->ui->chatWindow->settings()->setUserStyleSheetUrl(QUrl("qrc:/ChatWindow/style.css"));
     this->ui->chatWindow->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);//Handle link clicks by yourself
     this->ui->chatWindow->setContextMenuPolicy(Qt::NoContextMenu);
@@ -26,10 +31,19 @@ ChatWidget::ChatWidget(QWidget *parent) :
                      &QWebFrame::contentsSizeChanged,
                      this,
                      &ChatWidget::chatContentsSizeChanged);
+    QObject::connect(this->ui->wInput,
+                     &QLineEdit::returnPressed,
+                     this->ui->wSend,
+                     &QPushButton::click);
 }
 
 void ChatWidget::addMessage(Message *msg) {
     this->ui->chatWindow->page()->mainFrame()->documentElement().findFirst("body").appendInside(QString("%1\n").arg(msg->raw_message));
+}
+
+void ChatWidget::setChannel(const QString &channel){
+    this->channel = channel;
+    qDebug() << this->channel;
 }
 
 void ChatWidget::linkClicked(const QUrl &url){
@@ -75,6 +89,6 @@ void ChatWidget::chatContentsSizeChanged(const QSize &size) {
 
 void ChatWidget::on_wSend_clicked()
 {
-    //write.sendCommand(IrcCommand::createMessage(this->ui->wChannel->text(), this->ui->wInput->text()));
+    MainWindow::write.sendMessage(this->channel, this->ui->wInput->text());
     this->ui->wInput->clear();
 }

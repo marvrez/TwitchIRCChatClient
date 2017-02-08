@@ -22,7 +22,7 @@ public:
     bool joinChannel(const QString *channelName);
     bool isInChannel(const QString *channelName);
     bool removeChannel(QString channelName);
-    void sendMessage(const QString &channel, const QString &message);
+    void sendMessage(const QString channel, const QString message);
     const QSet<QString>* getChannels() const;
     QList<Message*>* getMessages(const QString &channelName);
 

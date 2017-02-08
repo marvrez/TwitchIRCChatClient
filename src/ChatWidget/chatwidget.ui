@@ -34,12 +34,12 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QTextEdit" name="wInput">
-         <property name="textInteractionFlags">
-          <set>Qt::TextEditorInteraction</set>
-         </property>
+        <widget class="QLineEdit" name="wInput">
          <property name="placeholderText">
           <string>Send a message</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

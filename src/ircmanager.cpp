@@ -51,7 +51,7 @@ bool IrcManager::removeChannel(QString channelName) {
     return this->sendCommand(part);
 }
 
-void IrcManager::sendMessage(const QString &channel, const QString &message) {
+void IrcManager::sendMessage(const QString channel, const QString message) {
     this->sendCommand(IrcCommand::createMessage(channel, message));
 }
 
