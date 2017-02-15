@@ -30,7 +30,7 @@ public:
     void tryRemoveFirstMessage(QList<Message *> *messages);
 
     void setChannel(const QString &channel);
-    QMap<QString, bool>* getChannelStates();
+    QVariantMap* getChannelStates();
     ~ChatWidget();
 
 private slots:
@@ -42,7 +42,7 @@ private:
     int messageCount = 150;
     QString channel;
     void chatContentsSizeChanged(const QSize &size);
-    QMap<QString, bool> channelStates;
+    QVariantMap channelStates;
 };
 
 #endif // CHATWIDGET_H

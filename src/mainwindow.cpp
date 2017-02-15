@@ -69,7 +69,7 @@ void MainWindow::connectToIrc() {
 void MainWindow::onPrivMessageReceived(IrcPrivateMessage *message) {
     QList<Message*> *messages = read.getMessages(message->target());
 
-    QMap<QString,bool>* channelStates = chatWindows[this->curChannel]->getChannelStates();
+    auto channelStates = chatWindows[this->curChannel]->getChannelStates();
     Message *newMessage = Message::onMessage(message, channelStates);
     messages->append(newMessage);
     if(message->target() == this->curChannel) {

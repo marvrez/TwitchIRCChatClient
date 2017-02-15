@@ -6,7 +6,7 @@
 MentionManager Message::mention_manager;
 
 
-Message* Message::onMessage(IrcPrivateMessage *message, QMap<QString, bool>* channelStates) {
+Message* Message::onMessage(IrcPrivateMessage *message, QVariantMap* channelStates) {
     Message *msg = new Message();
     QVariantMap tags = message->tags();
 
@@ -17,16 +17,18 @@ Message* Message::onMessage(IrcPrivateMessage *message, QMap<QString, bool>* cha
     QString displayName = tags["display-name"].toString();
     msg->username = (displayName.length() > 0) ? displayName : message->nick();
 
+    //set user-id
+    msg->channel_id = tags["room-id"].toString();
+    qDebug() << msg->channel_id;
+
     //set color
     QString colorString = tags["color"].toString();
     msg->username_color = (colorString.length() == 0) ? QColor("#00f0a0") : QColor(colorString);
 
-    //check if user is sub
-    if(tags.find("subscriber") != tags.end()) {
+    //check if submode is on
+    if(tags.find("subscriber") != tags.end())
         msg->subMode = tags["subscriber"].toBool();
-        //qDebug() << "LULLLL::" << msg->subMode;
-    }
-    //qDebug() << msg->message;
+
 
     //get badges
     auto badges = tags.find("badges").value().toString().split(",");
@@ -35,10 +37,18 @@ Message* Message::onMessage(IrcPrivateMessage *message, QMap<QString, bool>* cha
         //qDebug() << badge;
         if(badge.contains("subscriber"))
             msg->subscriber = true;
+        if(badge.contains("premium"))
+            msg->prime = true;
+        if(badge.contains("staff"))
+            msg->staff = true;
         if(badge.contains("moderator"))
             msg->moderator = true;
         if(badge.contains("broadcaster"))
             msg->broadcaster = true;
+        if(badge.contains("global_mod"))
+            msg->global_moderator = true;
+        if(badge.contains("turbo"))
+            msg->turbo = true;
     }
 
     QString emotesString = tags["emotes"].toString();
@@ -65,7 +75,7 @@ Message* Message::onMessage(IrcPrivateMessage *message, QMap<QString, bool>* cha
         content = content.arg("");
     }
     html_message.append(QString("<span class=\"timestamp\" style=\"color:#727272;\">%1 </span>").arg(QTime::currentTime().toString().mid(0,5)));
-    if((channelStates->contains("subs-only") && (*channelStates)["subs-only"]) && (!msg->subscriber || !msg->moderator || !msg->broadcaster )) {
+    if((channelStates->contains("subs-only") && (*channelStates)["subs-only"].toBool()) && (!msg->subscriber || !msg->moderator || !msg->broadcaster )) {
         html_message.append(QString("<span class=\"not subscribed\" style=\"color:#727272;\">%1 </span>").arg(" This room is in subscribers only mode. To talk, purchase a channel subscription."));
         html_message.append("</div>");
         msg->message = html_message;
@@ -149,7 +159,7 @@ void Message::setGlobalBadges(QString &html_message, Message* msg) {
     }
     if(msg->prime) {
         html_message.append(QString("<span class =\"prime\">"
-                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/d97c37bd-a6f5-4c38-8f57-4e4bef88af34/1\" \>  "
+                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/a1dd5073-19c3-4911-8cb4-c464a7bc1510/1\" \>  "
                                     "<\span>"));
     }
 

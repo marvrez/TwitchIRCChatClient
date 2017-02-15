@@ -13,8 +13,9 @@ class Message
 public:
     // Username with proper capitalization
     QString username;
-
     QColor username_color;
+
+    QString channel_id;
 
     QString raw_message;
 
@@ -24,7 +25,7 @@ public:
     // Whether it's a /me or not
     bool action;
 
-    // IRCv3 flags
+    // IRCv3 flags --- switch over to enum or bitflags?
     bool moderator, global_moderator;
     bool staff;
     bool broadcaster;
@@ -37,10 +38,11 @@ public:
 
     static MentionManager mention_manager;
 
-    static Message* onMessage(IrcPrivateMessage *message, QMap<QString, bool> *channelStates);
+    static Message* onMessage(IrcPrivateMessage *message, QVariantMap* channelStates);
     static bool variantByIndex(const struct EmoteReplacement &v1, const struct EmoteReplacement &v2);
     static int parseLinks(QString &htmlContent);
     static void parseTwitchEmotes(QString &message, QString &emotesString);
+
 private:
     static void setGlobalBadges(QString& html_message, Message* msg);
     static void setSubBadges(QString& html_message, Message* msg);

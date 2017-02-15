@@ -50,7 +50,7 @@ void ChatWidget::addMessage(Message *msg) {
 
 void ChatWidget::onMessageReceived(IrcMessage *message) {
     QVariantMap tags = message->tags();
-    qDebug() << tags;
+    //qDebug() << tags;
     if(!tags.isEmpty()) {
         //this->channelStates.clear();
         if(tags.contains("emote-only"))
@@ -73,11 +73,11 @@ void ChatWidget::setChannel(const QString &channel){
     qDebug() << this->channel;
 }
 
-QMap<QString, bool>* ChatWidget::getChannelStates() {
+QVariantMap* ChatWidget::getChannelStates() {
     qDebug() << "CHANNELSTATES:" << channelStates;
     if(!channelStates.empty())
         return &this->channelStates;
-    return new QMap<QString,bool>();
+    return new QVariantMap();
 }
 
 void ChatWidget::linkClicked(const QUrl &url) const {
