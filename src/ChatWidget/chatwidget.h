@@ -18,24 +18,31 @@ class ChatWidget : public QDialog
 public:
     explicit ChatWidget(QWidget *parent = 0);
     //bool acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame);
-    void addMessage(Message *msg);
-    void setChannel(const QString &channel);
-    void linkClicked(const QUrl &url);
     int scrollValue;
     bool autoScroll;
+
+    void linkClicked(const QUrl &url) const;
+
+    //screen handling
     void updateMessageScreen(QList<Message*>* messages);
     void channelChanged(QList<Message*>* messages);
+    void addMessage(Message *msg);
+    void tryRemoveFirstMessage(QList<Message *> *messages);
 
+    void setChannel(const QString &channel);
+    QMap<QString, bool> getChannelStates();
     ~ChatWidget();
 
 private slots:
     void on_wSend_clicked();
+    void onMessageReceived(IrcMessage *message);
 
 private:
     Ui::ChatWidget *ui;
     int messageCount = 150;
     QString channel;
     void chatContentsSizeChanged(const QSize &size);
+    QMap<QString, bool> channelStates;
 };
 
 #endif // CHATWIDGET_H

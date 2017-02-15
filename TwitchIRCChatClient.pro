@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webkitwidgets
+QT       += core gui webkitwidgets webkit
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -38,7 +38,6 @@ RESOURCES += lib/QDarkStyleSheet/qdarkstyle/style.qrc \
              resources/loginwindow.qrc \
              src/ChatWidget/chatwindow.qrc \
     src/ChatWidget/chatwindow.qrc
-             #main.qrc
 
 FORMS    += src/ui/mainwindow.ui \
     src/ui/loginwindow.ui \

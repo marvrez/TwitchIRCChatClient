@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     void connectToIrc();
-    void onMessageReceived(IrcPrivateMessage *message);
+    void onPrivMessageReceived(IrcPrivateMessage *message);
     void addTab(const QString channel); //only for debugging
     ~MainWindow();
 
@@ -33,7 +33,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QString curChannel;
-    ChatWidget *curChatWidget;
     QMap <QString, ChatWidget*> chatWindows;
 };
 

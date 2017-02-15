@@ -4,6 +4,7 @@
 #include <QtCore>
 #include <QWebView>
 #include <QWebSettings>
+#include <QDesktopServices>
 #define API_VERSION 5
 
 LoginWindow::LoginWindow(QWidget *parent) :
@@ -14,7 +15,11 @@ LoginWindow::LoginWindow(QWidget *parent) :
     this->setWindowTitle("Login");
 
     webView = new QWebView;
-    QWebSettings::clearMemoryCaches;
+    QWebSettings::clearMemoryCaches();
+    QWebSettings *webSettings = QWebSettings::globalSettings();
+    webSettings->setAttribute(QWebSettings::PluginsEnabled,true);
+    webSettings->setAttribute(QWebSettings::JavascriptEnabled,true);
+    webSettings->setAttribute(QWebSettings::PluginsEnabled,true);
 
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "marvin", "chat");
     this->ui->cbAutoConnect->setChecked(settings.value("Main/auto_connect", false).toBool());
@@ -41,6 +46,7 @@ void LoginWindow::on_btnLogin_clicked(){
     this->exec();
 }
 
+/*
 void LoginWindow::on_btnTwitchLogin_clicked(){
      this->webView->close();
 
@@ -73,7 +79,7 @@ void LoginWindow::on_btnTwitchLogin_clicked(){
 
                      QUrl url = QUrl(QString("https://api.twitch.tv/kraken?oauth_token=%1&api_version=%2").arg(oauth).arg(API_VERSION));
                      qDebug() << url;
-                     webView->load(QUrl("")); //idk whyk... but it works
+                     //webView->load(url); //idk whyk... but it works
                      QNetworkRequest req(url);
                      QNetworkReply *reply = this->network_access_manager.get(req);
 
@@ -87,12 +93,12 @@ void LoginWindow::on_btnTwitchLogin_clicked(){
                              QString username = token.value("user_name").toString();
                              QSettings settings(QSettings::IniFormat, QSettings::UserScope, "marvin", "chat");
                              settings.setValue("Credentials/username", username);
-                             emit accept();
+                             //emit accept();
                          });
                 }
          }
      });
-}
+}*/
 
 void LoginWindow::on_cbAutoConnect_stateChanged(int state)
 {
@@ -105,3 +111,8 @@ void LoginWindow::on_cbShowOauth_stateChanged(int state) {
     else this->ui->oauth->setEchoMode(QLineEdit::Password);
 }
 
+
+
+void LoginWindow::on_methodTwoLabel_linkActivated(const QString &link){
+    QDesktopServices::openUrl(QUrl(link));
+}

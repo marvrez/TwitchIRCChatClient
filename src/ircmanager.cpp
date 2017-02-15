@@ -35,7 +35,7 @@ bool IrcManager::joinChannel(const QString *channelName) {
     return false;
 }
 
-bool IrcManager::isInChannel(const QString *channelName) {
+bool IrcManager::isInChannel(const QString *channelName) const {
     return this->channels.contains(channelName->toLower());
 }
 
@@ -49,9 +49,10 @@ bool IrcManager::removeChannel(QString channelName) {
     IrcCommand *part =  IrcCommand::createPart(channelName);
     qDebug() << "Left channel:" << channelName;
     return this->sendCommand(part);
+
 }
 
-void IrcManager::sendMessage(const QString channel, const QString message) {
+void IrcManager::sendMessage(const QString channel, const QString message)  {
     this->sendCommand(IrcCommand::createMessage(channel, message));
 }
 

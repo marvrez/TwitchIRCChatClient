@@ -3,8 +3,10 @@
 
 #include "mentionmanager.h"
 #include <IrcMessage>
+#include <QRegularExpression>
 #include <QColor>
 
+const QRegularExpression URL_REGEX = QRegularExpression("(?<![^ ])((?:https?|ftp)://\\S+)(?![^ ])");
 
 class Message
 {
@@ -28,9 +30,21 @@ public:
     bool broadcaster;
     bool bot;
 
+    bool subMode;
+    bool subscriber;
+
     static MentionManager mention_manager;
 
-    static Message* onMessage(IrcPrivateMessage *message);
+    static Message* onMessage(IrcPrivateMessage *message, QMap<QString, bool> &channelStates);
+    static bool variantByIndex(const struct EmoteReplacement &v1, const struct EmoteReplacement &v2);
+    static int parseLinks(QString &htmlContent);
+    static void parseTwitchEmotes(QString &message, QString &emotesString);
+};
+
+struct EmoteReplacement {
+    unsigned int index;
+    unsigned int length;
+    QString tag;
 };
 
 #endif // MESSAGE_H

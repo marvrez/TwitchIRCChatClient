@@ -35,8 +35,14 @@
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QLineEdit" name="wInput">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
          <property name="placeholderText">
           <string>Send a message</string>
+         </property>
+         <property name="cursorMoveStyle">
+          <enum>Qt::LogicalMoveStyle</enum>
          </property>
          <property name="clearButtonEnabled">
           <bool>true</bool>
@@ -45,6 +51,12 @@
        </item>
        <item>
         <widget class="QPushButton" name="wSend">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="sizeIncrement">
           <size>
            <width>0</width>
@@ -56,8 +68,8 @@
          </property>
          <property name="iconSize">
           <size>
-           <width>17</width>
-           <height>16</height>
+           <width>28</width>
+           <height>31</height>
           </size>
          </property>
          <property name="autoRepeat">

@@ -26,17 +26,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     QMainWindow::centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
     this->setWindowTitle("Twitch chat client");
-    //this->ui->tabWidget->setStyleSheet("background-color: #6441A4");
+    this->ui->tabWidget->setStyleSheet("QTabBar::tab {background-color:#27252D; font-family: \"Arial\", Times, serif;}"
+                                       "QTabBar::tab::selected, QTabBar::tab::hover {background-color:#17141F; font: bold;}");
     QObject::connect(&read,
                      &IrcConnection::privateMessageReceived,
                      this,
-                     &MainWindow::onMessageReceived);
+                     &MainWindow::onPrivMessageReceived);
     QObject::connect(this->ui->tabWidget,
                      &QTabWidget::tabBarClicked,
                      this,
                      &MainWindow::channelChanged);
 
-    QToolButton *tb = new QToolButton(this);
+    QToolButton *tb = new QToolButton();
     tb->setText("+");
     tb->setAutoRaise(true);
     QObject::connect(tb,
@@ -65,16 +66,18 @@ void MainWindow::connectToIrc() {
     //TODO: IMPLEMENT
 }
 
-void MainWindow::onMessageReceived(IrcPrivateMessage *message) {
+void MainWindow::onPrivMessageReceived(IrcPrivateMessage *message) {
     QList<Message*> *messages = read.getMessages(message->target());
 
-    int maxMessages = 150; //twitch default
-    Message *newMessage = Message::onMessage(message);
+    QMap<QString,bool> channelStates = chatWindows[this->curChannel]->getChannelStates();
+    Message *newMessage = Message::onMessage(message, channelStates);
     messages->append(newMessage);
     if(message->target() == this->curChannel) {
         chatWindows[this->curChannel]->updateMessageScreen(messages);
         chatWindows[this->curChannel]->addMessage(newMessage);
     }
+    else
+        chatWindows[this->curChannel]->tryRemoveFirstMessage(messages);
 }
 
 void MainWindow::addTab() {
@@ -117,13 +120,16 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index) {
         ui->tabWidget->widget(index)->close();
         ui->tabWidget->removeTab(index);
         ui->tabWidget->setCurrentIndex(index-1);
+        MainWindow::channelChanged(this->ui->tabWidget->currentIndex());
     }
     //TODO: also delete widget?
 }
 
 void MainWindow::channelChanged(int index) {
-    this->curChannel = "#" + ui->tabWidget->tabText(index);
+    if(index != ui->tabWidget->count()-1) {
+        this->curChannel = "#" + ui->tabWidget->tabText(index);
 
-    chatWindows[this->curChannel]->channelChanged(read.getMessages(this->curChannel));
-    qDebug() <<  this->curChannel;
+        chatWindows[this->curChannel]->channelChanged(read.getMessages(this->curChannel));
+        qDebug() <<  this->curChannel;
+    }
 }

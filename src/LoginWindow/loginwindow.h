@@ -27,11 +27,13 @@ public:
     private slots:
         void on_btnLogin_clicked();
 
-        void on_btnTwitchLogin_clicked();
+        //void on_btnTwitchLogin_clicked();
 
         void on_cbAutoConnect_stateChanged(int state);
 
         void on_cbShowOauth_stateChanged(int state);
+
+        void on_methodTwoLabel_linkActivated(const QString &link);
 
 private:
     Ui::LoginWindow *ui;

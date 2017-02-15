@@ -23,6 +23,8 @@ ChatWidget::ChatWidget(QWidget *parent) :
     this->ui->chatWindow->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);//Handle link clicks by yourself
     this->ui->chatWindow->setContextMenuPolicy(Qt::NoContextMenu);
 
+    this->ui->wInput->setFocus();
+
     QObject::connect(this->ui->chatWindow,
                      &QWebView::linkClicked,
                      this,
@@ -35,10 +37,34 @@ ChatWidget::ChatWidget(QWidget *parent) :
                      &QLineEdit::returnPressed,
                      this->ui->wSend,
                      &QPushButton::click);
+    QObject::connect(&MainWindow::read,
+                     &IrcConnection::messageReceived,
+                     this,
+                     &ChatWidget::onMessageReceived);
 }
 
 void ChatWidget::addMessage(Message *msg) {
-    this->ui->chatWindow->page()->mainFrame()->documentElement().findFirst("body").appendInside(QString("%1\n").arg(msg->raw_message));
+    //qDebug() << msg->raw_message << QTime::currentTime().toString();
+    this->ui->chatWindow->page()->mainFrame()->documentElement().findFirst("body").appendInside(QString("%1\n").arg(msg->message));
+}
+
+void ChatWidget::onMessageReceived(IrcMessage *message) {
+    QVariantMap tags = message->tags();
+    if(!tags.isEmpty()) {
+        //this->channelStates.clear();
+        if(tags.contains("emote-only"))
+            this->channelStates["emote-only"] = tags["emote-only"].toBool();
+        if(tags.contains("followers-only"))
+            this->channelStates["followers-only"] = tags["followers-only"].toBool();
+        if(tags.contains("r9k"))
+            this->channelStates["r9k"] = tags["r9k"].toBool();
+        if(tags.contains("slow"))
+            this->channelStates["slow"] = tags["slow"].toBool();
+        if(tags.contains("subs-only")) {
+            this->channelStates["subs-only"] = tags["subs-only"].toBool();
+        }
+        qDebug() << channelStates;
+    }
 }
 
 void ChatWidget::setChannel(const QString &channel){
@@ -46,7 +72,14 @@ void ChatWidget::setChannel(const QString &channel){
     qDebug() << this->channel;
 }
 
-void ChatWidget::linkClicked(const QUrl &url){
+QMap<QString, bool> ChatWidget::getChannelStates() {
+    qDebug() << "CHANNELSTATES:" << channelStates;
+    if(!channelStates.empty())
+        return this->channelStates;
+    return QMap<QString,bool>();
+}
+
+void ChatWidget::linkClicked(const QUrl &url) const {
     QDesktopServices::openUrl(url);
 }
 
@@ -63,12 +96,18 @@ void ChatWidget::updateMessageScreen(QList<Message*> *messages){
     }
 }
 
+void ChatWidget::tryRemoveFirstMessage(QList<Message*> *messages) {
+    if (messages->count() > messageCount)
+        delete messages->takeFirst();
+}
+
 void ChatWidget::channelChanged(QList<Message*> *messages) {
     QWebFrame* frame = this->ui->chatWindow->page()->mainFrame();
     frame->setHtml("");
 
-    for (int i = 0; i < messages->count(); ++i)
+    for (int i = 0; i < messages->count(); ++i) {
         addMessage(messages->at(i));
+    }
 
     this->scrollValue = 0;
     this->autoScroll = true;
@@ -87,8 +126,7 @@ void ChatWidget::chatContentsSizeChanged(const QSize &size) {
         frame->setScrollBarValue(Qt::Vertical, this->scrollValue);
 }
 
-void ChatWidget::on_wSend_clicked()
-{
+void ChatWidget::on_wSend_clicked() {
     MainWindow::write.sendMessage(this->channel, this->ui->wInput->text());
     this->ui->wInput->clear();
 }

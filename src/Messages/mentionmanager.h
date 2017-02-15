@@ -8,6 +8,7 @@ struct Mention {
     QRegularExpression regex; // regex of mention
     QString channel; // channel where mention should popup, empty for same channel
     QList<QString> usernames; // only for certain usernames
+    QString cssclass;
 };
 
 
