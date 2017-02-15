@@ -6,7 +6,7 @@
 MentionManager Message::mention_manager;
 
 
-Message* Message::onMessage(IrcPrivateMessage *message, QMap<QString, bool> &channelStates) {
+Message* Message::onMessage(IrcPrivateMessage *message, QMap<QString, bool>* channelStates) {
     Message *msg = new Message();
     QVariantMap tags = message->tags();
 
@@ -19,7 +19,7 @@ Message* Message::onMessage(IrcPrivateMessage *message, QMap<QString, bool> &cha
 
     //set color
     QString colorString = tags["color"].toString();
-    msg->username_color = (colorString.length() == 0) ? QColor("#aa6633") : QColor(colorString);
+    msg->username_color = (colorString.length() == 0) ? QColor("#00f0a0") : QColor(colorString);
 
     //check if user is sub
     if(tags.find("subscriber") != tags.end()) {
@@ -65,7 +65,7 @@ Message* Message::onMessage(IrcPrivateMessage *message, QMap<QString, bool> &cha
         content = content.arg("");
     }
     html_message.append(QString("<span class=\"timestamp\" style=\"color:#727272;\">%1 </span>").arg(QTime::currentTime().toString().mid(0,5)));
-    if((channelStates.find("subs-only") != channelStates.end() && channelStates["subs-only"]) && (!msg->subscriber || !msg->moderator || !msg->broadcaster )) {
+    if((channelStates->contains("subs-only") && (*channelStates)["subs-only"]) && (!msg->subscriber || !msg->moderator || !msg->broadcaster )) {
         html_message.append(QString("<span class=\"not subscribed\" style=\"color:#727272;\">%1 </span>").arg(" This room is in subscribers only mode. To talk, purchase a channel subscription."));
         html_message.append("</div>");
         msg->message = html_message;
@@ -73,16 +73,8 @@ Message* Message::onMessage(IrcPrivateMessage *message, QMap<QString, bool> &cha
         return msg;
     }
 
-    if(msg->broadcaster) {
-        html_message.append(QString("<span class =\"broadcaster\">"
-                                    "<img src = \"https://assistly-production.s3.amazonaws.com/31172/portal_attachments/349942/broadcaster-background_original.png?AWSAccessKeyId=AKIAJNSFWOZ6ZS23BMKQ&Expires=1487127862&Signature=9jWdzLqwoQRv9wZkat9Ev6DAE84%3D&response-content-disposition=filename%3D%22broadcaster-background.png%22&response-content-type=image%2Fpng\"\> <\span>"));
-    }
-    else if (msg->moderator) {
-
-    }
-    if(msg->subscriber) {
-
-    }
+    setGlobalBadges(html_message, msg);
+    setSubBadges(html_message, msg);
     html_message.append(QString("<span class=\"username\" style=\"color: %1;\">%2</span>").arg(msg->username_color.name(), msg->username));
 
     html_message.append("<span class=\"colon\">:</span>");
@@ -121,4 +113,54 @@ int Message::parseLinks(QString &html_content) {
 
 void Message::parseTwitchEmotes(QString &message, QString &emotesString) {
 
+}
+
+void Message::setGlobalBadges(QString &html_message, Message* msg) {
+    //https://badges.twitch.tv/v1/badges/global/display?language=en
+    if(msg->admin) {
+        html_message.append(QString("<span class =\"admin\">"
+                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/9ef7e029-4cdf-4d4d-a0d5-e2b3fb2583fe/1\" \>  "
+                                    "<\span>"));
+    }
+    if(msg->bot) {
+        html_message.append(QString("<span class =\"bot\">"
+                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/df9095f6-a8a0-4cc2-bb33-d908c0adffb8/1\" \>  "
+                                    "<\span>"));
+    }
+    if(msg->broadcaster) {
+        html_message.append(QString("<span class =\"broadcaster\">"
+                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/5527c58c-fb7d-422d-b71b-f309dcb85cc1/1\" \>  "
+                                    "<\span>"));
+    }
+    else if (msg->moderator) {
+        html_message.append(QString("<span class =\"moderator\">"
+                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/3267646d-33f0-4b17-b3df-f923a41db1d0/1\" \>  "
+                                    "<\span>"));
+    }
+    if(msg->global_moderator) {
+        html_message.append(QString("<span class =\"global moderator\">"
+                                    "<img src = \"hhttps://static-cdn.jtvnw.net/badges/v1/9384c43e-4ce7-4e94-b2a1-b93656896eba/1\" \>  "
+                                    "<\span>"));
+    }
+    if(msg->turbo) {
+        html_message.append(QString("<span class =\"turbo\">"
+                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/bd444ec6-8f34-4bf9-91f4-af1e3428d80f/1\" \>  "
+                                    "<\span>"));
+    }
+    if(msg->prime) {
+        html_message.append(QString("<span class =\"prime\">"
+                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/d97c37bd-a6f5-4c38-8f57-4e4bef88af34/1\" \>  "
+                                    "<\span>"));
+    }
+
+    if(msg->staff) {
+        html_message.append(QString("<span class =\"staff\">"
+                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/d97c37bd-a6f5-4c38-8f57-4e4bef88af34/1\" \>  "
+                                    "<\span>"));
+    }
+}
+
+void Message::setSubBadges(QString &html_message, Message* msg)
+{
+    //https://badges.twitch.tv/v1/badges/channels/24991333/display
 }

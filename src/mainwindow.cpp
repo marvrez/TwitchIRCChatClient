@@ -69,7 +69,7 @@ void MainWindow::connectToIrc() {
 void MainWindow::onPrivMessageReceived(IrcPrivateMessage *message) {
     QList<Message*> *messages = read.getMessages(message->target());
 
-    QMap<QString,bool> channelStates = chatWindows[this->curChannel]->getChannelStates();
+    QMap<QString,bool>* channelStates = chatWindows[this->curChannel]->getChannelStates();
     Message *newMessage = Message::onMessage(message, channelStates);
     messages->append(newMessage);
     if(message->target() == this->curChannel) {
@@ -86,6 +86,7 @@ void MainWindow::addTab() {
                                          tr("Channel:"), QLineEdit::Normal,
                                          QDir::home().dirName(), &ok);
     if (ok && !text.isEmpty()) {
+        text = text.trimmed();
         QString ircUserName = (text.startsWith("#")) ? text.toLower() : "#" + text.toLower();
 
         if(write.joinChannel(&ircUserName) && read.joinChannel(&ircUserName)){
@@ -126,7 +127,8 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index) {
 }
 
 void MainWindow::channelChanged(int index) {
-    if(index != ui->tabWidget->count()-1) {
+    qDebug() << (this->curChannel != "#"+ui->tabWidget->tabText(index));
+    if(index != ui->tabWidget->count()-1 && this->curChannel != "#"+ui->tabWidget->tabText(index)) {
         this->curChannel = "#" + ui->tabWidget->tabText(index);
 
         chatWindows[this->curChannel]->channelChanged(read.getMessages(this->curChannel));

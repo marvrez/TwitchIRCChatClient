@@ -25,20 +25,25 @@ public:
     bool action;
 
     // IRCv3 flags
-    bool moderator;
+    bool moderator, global_moderator;
     bool staff;
     bool broadcaster;
+    bool admin;
     bool bot;
 
     bool subMode;
     bool subscriber;
+    bool turbo, prime;
 
     static MentionManager mention_manager;
 
-    static Message* onMessage(IrcPrivateMessage *message, QMap<QString, bool> &channelStates);
+    static Message* onMessage(IrcPrivateMessage *message, QMap<QString, bool> *channelStates);
     static bool variantByIndex(const struct EmoteReplacement &v1, const struct EmoteReplacement &v2);
     static int parseLinks(QString &htmlContent);
     static void parseTwitchEmotes(QString &message, QString &emotesString);
+private:
+    static void setGlobalBadges(QString& html_message, Message* msg);
+    static void setSubBadges(QString& html_message, Message* msg);
 };
 
 struct EmoteReplacement {

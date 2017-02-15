@@ -30,7 +30,7 @@ public:
     void tryRemoveFirstMessage(QList<Message *> *messages);
 
     void setChannel(const QString &channel);
-    QMap<QString, bool> getChannelStates();
+    QMap<QString, bool>* getChannelStates();
     ~ChatWidget();
 
 private slots:

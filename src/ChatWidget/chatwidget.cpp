@@ -18,7 +18,7 @@ ChatWidget::ChatWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     this->layout()->setContentsMargins(0,0,0,0);
-    this->ui->wSend->setStyleSheet(("background-color: #6441A4"));
+    this->ui->wSend->setStyleSheet(("background-color: #6441A5"));
     this->ui->chatWindow->settings()->setUserStyleSheetUrl(QUrl("qrc:/ChatWindow/style.css"));
     this->ui->chatWindow->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);//Handle link clicks by yourself
     this->ui->chatWindow->setContextMenuPolicy(Qt::NoContextMenu);
@@ -50,6 +50,7 @@ void ChatWidget::addMessage(Message *msg) {
 
 void ChatWidget::onMessageReceived(IrcMessage *message) {
     QVariantMap tags = message->tags();
+    qDebug() << tags;
     if(!tags.isEmpty()) {
         //this->channelStates.clear();
         if(tags.contains("emote-only"))
@@ -72,11 +73,11 @@ void ChatWidget::setChannel(const QString &channel){
     qDebug() << this->channel;
 }
 
-QMap<QString, bool> ChatWidget::getChannelStates() {
+QMap<QString, bool>* ChatWidget::getChannelStates() {
     qDebug() << "CHANNELSTATES:" << channelStates;
     if(!channelStates.empty())
-        return this->channelStates;
-    return QMap<QString,bool>();
+        return &this->channelStates;
+    return new QMap<QString,bool>();
 }
 
 void ChatWidget::linkClicked(const QUrl &url) const {
