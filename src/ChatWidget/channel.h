@@ -7,7 +7,7 @@
 #include <QString>
 #include <QVariantMap>
 
-
+//Contains data about the current channel
 class Channel : public QObject
 {
     Q_OBJECT

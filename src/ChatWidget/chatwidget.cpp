@@ -47,61 +47,12 @@ ChatWidget::ChatWidget(QString channelName) : ChatWidget(){
     this->channelName = channelName;
     channel = new Channel(channelName);
 }
-/*
-void ChatWidget::loadSubBadges(QString roomID) {
-    if(!subBadgesLoaded) {
-        QUrl url = QUrl(QString("https://badges.twitch.tv/v1/badges/channels/%1/display").arg(roomID));
-        QNetworkRequest req(url);
-        QNetworkReply *reply = network_access_manager.get(req);
 
-        QObject::connect(reply, &QNetworkReply::finished, [=]() {
-            QByteArray data = reply->readAll();
-
-            QJsonDocument jsonDoc(QJsonDocument::fromJson(data));
-            QJsonObject root = jsonDoc.object();
-            QJsonValue versions = root.value("badge_sets").toObject().value("subscriber").toObject().value("versions");
-            QVariantMap versionMap = versions.toObject().toVariantMap();
-
-            for(auto it = versionMap.constBegin(); it != versionMap.constEnd(); ++it) {
-                    QString link = it.value().toMap().value("image_url_1x").toString();
-                    subBadges.insert(QString("subscriber/%1").arg(it.key()), link);
-            }
-            qDebug() << subBadges;
-        });
-        subBadgesLoaded = true;
-    }
-}
-*/
 void ChatWidget::addMessage(Message *msg) {
     //qDebug() << msg->raw_message << QTime::currentTime().toString();
     this->ui->chatWindow->page()->mainFrame()->documentElement().findFirst("body").appendInside(QString("%1\n").arg(msg->message));
 }
-/*
-void ChatWidget::onMessageReceived(IrcMessage *message) {
-    QVariantMap tags = message->tags();
-    qDebug() << message->toData();
-    this->roomData["room-id"] = tags.contains("room-id") ? tags["room-id"].toString() : QString("");
-    if(message->command() == "ROOMSTATE") {
-        if(!tags.isEmpty()) {
-            //this->roomData.clear();
-            if(tags.contains("emote-only"))
-                this->roomData["emote-only"] = tags["emote-only"].toBool();
-            if(tags.contains("followers-only"))
-                this->roomData["followers-only"] = tags["followers-only"].toBool();
-            if(tags.contains("r9k"))
-                this->roomData["r9k"] = tags["r9k"].toBool();
-            if(tags.contains("slow"))
-                this->roomData["slow"] = tags["slow"].toBool();
-            if(tags.contains("subs-only")) {
-                this->roomData["subs-only"] = tags["subs-only"].toBool();
-            }
-        }
-    }
-    else if (message->command() == "PRIVMSG") {
 
-    }
-}
-*/
 void ChatWidget::setChannelName(const QString &channelName){
     this->channelName = channelName;
     qDebug() << this->channelName;
@@ -156,18 +107,6 @@ void ChatWidget::chatContentsSizeChanged(const QSize &size) {
     else
         frame->setScrollBarValue(Qt::Vertical, this->scrollValue);
 }
-
-/*
-QVariantMap* ChatWidget::getRoomData() {
-    if(!roomData.empty())
-        return &this->roomData;
-    return new QVariantMap();
-}
-
-
-QMap<QString, QString> ChatWidget::getSubBadges() {
-    return subBadges;
-}*/
 
 void ChatWidget::on_wSend_clicked() {
     MainWindow::write.sendMessage(this->channelName, this->ui->wInput->text());

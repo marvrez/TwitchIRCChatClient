@@ -17,6 +17,7 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     Message *msg = new Message();
     QVariantMap tags = message->tags();
     QVariantMap* roomData = channel->getRoomData();
+    QString subBadge = "";
 
     //set raw message
     msg->raw_message = QString(message->toData());
@@ -41,7 +42,7 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
         if(badge.isEmpty()) continue;
         if(badge.contains("subscriber")) {
             msg->subscriber = true;
-            qDebug() << badge;
+            subBadge = badge;
         }
         if(badge.contains("premium"))
             msg->premium = true;
@@ -91,7 +92,7 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     }
 
     setGlobalBadges(html_message, msg);
-    setSubBadges(html_message, msg, roomData);
+    setSubBadges(html_message, msg->subscriber, channel->getSubBadges().value(subBadge));
     html_message.append(QString("<span class=\"username\" style=\"color: %1;\">%2</span>").arg(msg->username_color.name(), msg->username));
 
     html_message.append("<span class=\"colon\">:</span>");
@@ -177,12 +178,10 @@ void Message::setGlobalBadges(QString &html_message, Message* msg) {
     }
 }
 
-void Message::setSubBadges(QString &html_message, Message* msg, QVariantMap* roomData)
-{ //TODO: maybe make a mapping for user and sub icon(in chatwidget)?
-    if(!msg->subscriber) return;
+void Message::setSubBadges(QString &html_message, bool subscriber, QString subBadge) {
     //https://badges.twitch.tv/v1/badges/channels/24991333/display
-    QString roomID = roomData->value("room-id").toString();
-    if(roomID.isEmpty()) return;
-
-    QString month = roomData->value("subscriber/months").toString();
+    if(!subscriber || subBadge.isEmpty()) return;
+    html_message.append(QString("<span class =\"sub-badge\">"
+                                "<img src = \"%1\" \>  "
+                                "<\span>").arg(subBadge));
 }

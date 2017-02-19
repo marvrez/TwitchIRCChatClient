@@ -29,19 +29,14 @@ public:
     void addMessage(Message *msg);
     void tryRemoveFirstMessage(QList<Message *> *messages);
 
-    //void loadSubBadges(QString roomID);
     ~ChatWidget();
 
-    //getters
-    //QMap<QString, QString> getSubBadges();
-    //QVariantMap* getRoomData();
     Channel* getChannel();
 
     //setters
     void setChannelName(const QString &channelName);
 private slots:
     void on_wSend_clicked();
-    //void onMessageReceived(IrcMessage *message);
 
 private:
     Ui::ChatWidget *ui;
@@ -52,18 +47,9 @@ private:
     int scrollValue;
     bool autoScroll;
 
-    Channel* channel;
+    Channel* channel; //every widget has its own channel it's connected to..
 
     void chatContentsSizeChanged(const QSize &size);
-
-    //QNetworkAccessManager network_access_manager;
-
-    /*
-    //maps - connected to each room/channel
-    QVariantMap roomData; //room states - submode, r9k, etc..
-    QMap<QString, QString> subBadges; // month(of subscripment) - url
-
-    bool subBadgesLoaded = false;*/
 };
 
 #endif // CHATWIDGET_H

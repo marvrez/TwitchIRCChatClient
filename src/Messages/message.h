@@ -47,7 +47,7 @@ public:
 
 private:
     static void setGlobalBadges(QString& html_message, Message* msg);
-    static void setSubBadges(QString& html_message, Message* msg, QVariantMap* roomData);
+    static void setSubBadges(QString& html_message, bool subscriber, QString subBadge);
 };
 
 struct EmoteReplacement {
