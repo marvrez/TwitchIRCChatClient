@@ -24,7 +24,9 @@ SOURCES += src/main.cpp\
     src/LoginWindow/loginwindow.cpp \
     src/ircmanager.cpp \
     src/Messages/message.cpp \
-    src/ChatWidget/chatwidget.cpp
+    src/ChatWidget/chatwidget.cpp \
+    src/ChatWidget/resources.cpp \
+    src/ChatWidget/channel.cpp
 
 HEADERS  += src/mainwindow.h \
     src/LoginWindow/loginwindow.h \
@@ -32,7 +34,9 @@ HEADERS  += src/mainwindow.h \
     src/LoginWindow/browswerwindow.h \
     src/Messages/message.h \
     src/Messages/mentionmanager.h \
-    src/ChatWidget/chatwidget.h
+    src/ChatWidget/chatwidget.h \
+    src/ChatWidget/resources.h \
+    src/ChatWidget/channel.h
 
 RESOURCES += lib/QDarkStyleSheet/qdarkstyle/style.qrc \
              resources/loginwindow.qrc \

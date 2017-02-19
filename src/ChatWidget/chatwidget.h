@@ -2,6 +2,7 @@
 #define CHATWIDGET_H
 
 #include "Messages/message.h"
+#include "channel.h"
 
 #include <QDialog>
 #include <QWebView>
@@ -17,9 +18,8 @@ class ChatWidget : public QDialog
 
 public:
     explicit ChatWidget(QWidget *parent = 0);
+    ChatWidget(QString channelName);
     //bool acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame);
-    int scrollValue;
-    bool autoScroll;
 
     void linkClicked(const QUrl &url) const;
 
@@ -29,20 +29,41 @@ public:
     void addMessage(Message *msg);
     void tryRemoveFirstMessage(QList<Message *> *messages);
 
-    void setChannel(const QString &channel);
-    QVariantMap* getChannelStates();
+    //void loadSubBadges(QString roomID);
     ~ChatWidget();
 
+    //getters
+    //QMap<QString, QString> getSubBadges();
+    //QVariantMap* getRoomData();
+    Channel* getChannel();
+
+    //setters
+    void setChannelName(const QString &channelName);
 private slots:
     void on_wSend_clicked();
-    void onMessageReceived(IrcMessage *message);
+    //void onMessageReceived(IrcMessage *message);
 
 private:
     Ui::ChatWidget *ui;
+
     int messageCount = 150;
-    QString channel;
+    QString channelName;
+
+    int scrollValue;
+    bool autoScroll;
+
+    Channel* channel;
+
     void chatContentsSizeChanged(const QSize &size);
-    QVariantMap channelStates;
+
+    //QNetworkAccessManager network_access_manager;
+
+    /*
+    //maps - connected to each room/channel
+    QVariantMap roomData; //room states - submode, r9k, etc..
+    QMap<QString, QString> subBadges; // month(of subscripment) - url
+
+    bool subBadgesLoaded = false;*/
 };
 
 #endif // CHATWIDGET_H

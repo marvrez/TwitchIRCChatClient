@@ -23,6 +23,8 @@ public:
     bool isInChannel(const QString *channelName) const;
     bool removeChannel(QString channelName);
     void sendMessage(const QString channel, const QString message);
+
+    //getters
     const QSet<QString>* getChannels() const;
     QList<Message*>* getMessages(const QString &channelName);
 

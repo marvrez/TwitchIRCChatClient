@@ -68,16 +68,20 @@ void MainWindow::connectToIrc() {
 
 void MainWindow::onPrivMessageReceived(IrcPrivateMessage *message) {
     QList<Message*> *messages = read.getMessages(message->target());
+    ChatWidget* room = chatWindows[this->curChannel];
 
-    auto channelStates = chatWindows[this->curChannel]->getChannelStates();
-    Message *newMessage = Message::onMessage(message, channelStates);
+    auto roomID = message->tags().value("room-id").toString();
+    if(!roomID.isEmpty()) room->getChannel()->loadSubBadges(roomID);
+
+    Message* newMessage = Message::onMessage(message, room->getChannel());
     messages->append(newMessage);
+
     if(message->target() == this->curChannel) {
-        chatWindows[this->curChannel]->updateMessageScreen(messages);
-        chatWindows[this->curChannel]->addMessage(newMessage);
+        room->updateMessageScreen(messages);
+        room->addMessage(newMessage);
     }
     else
-        chatWindows[this->curChannel]->tryRemoveFirstMessage(messages);
+        room->tryRemoveFirstMessage(messages);
 }
 
 void MainWindow::addTab() {
@@ -90,8 +94,7 @@ void MainWindow::addTab() {
         QString ircUserName = (text.startsWith("#")) ? text.toLower() : "#" + text.toLower();
 
         if(write.joinChannel(&ircUserName) && read.joinChannel(&ircUserName)){
-            if(!chatWindows.contains(ircUserName)) chatWindows[ircUserName] = new ChatWidget(this);
-            chatWindows[ircUserName]->setChannel(ircUserName);
+            if(!chatWindows.contains(ircUserName)) chatWindows[ircUserName] = new ChatWidget(ircUserName);
             this->ui->tabWidget->insertTab(ui->tabWidget->count() - 1, chatWindows[ircUserName], text.toLower());
         }
 
@@ -132,6 +135,6 @@ void MainWindow::channelChanged(int index) {
         this->curChannel = "#" + ui->tabWidget->tabText(index);
 
         chatWindows[this->curChannel]->channelChanged(read.getMessages(this->curChannel));
-        qDebug() <<  this->curChannel;
+        qDebug() <<  "SWITCHED TO CHANNEL: " << this->curChannel;
     }
 }

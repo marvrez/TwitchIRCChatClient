@@ -1,14 +1,22 @@
 #include "message.h"
+#include "ChatWidget/chatwidget.h"
+#include <ChatWidget/resources.h>
 
 #include <QRegularExpression>
+#include <QUrl>
 #include <QDebug>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QJsonObject>
+#include <QJsonDocument>
+
 //static variables
 MentionManager Message::mention_manager;
 
-
-Message* Message::onMessage(IrcPrivateMessage *message, QVariantMap* channelStates) {
+Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     Message *msg = new Message();
     QVariantMap tags = message->tags();
+    QVariantMap* roomData = channel->getRoomData();
 
     //set raw message
     msg->raw_message = QString(message->toData());
@@ -16,10 +24,6 @@ Message* Message::onMessage(IrcPrivateMessage *message, QVariantMap* channelStat
     //set display name
     QString displayName = tags["display-name"].toString();
     msg->username = (displayName.length() > 0) ? displayName : message->nick();
-
-    //set user-id
-    msg->channel_id = tags["room-id"].toString();
-    qDebug() << msg->channel_id;
 
     //set color
     QString colorString = tags["color"].toString();
@@ -33,12 +37,14 @@ Message* Message::onMessage(IrcPrivateMessage *message, QVariantMap* channelStat
     //get badges
     auto badges = tags.find("badges").value().toString().split(",");
     //qDebug() << "ADSASDSDA:" << badges;
-    for(QString badge : badges) {
-        //qDebug() << badge;
-        if(badge.contains("subscriber"))
+    for(QString badge: badges) {
+        if(badge.isEmpty()) continue;
+        if(badge.contains("subscriber")) {
             msg->subscriber = true;
+            qDebug() << badge;
+        }
         if(badge.contains("premium"))
-            msg->prime = true;
+            msg->premium = true;
         if(badge.contains("staff"))
             msg->staff = true;
         if(badge.contains("moderator"))
@@ -74,8 +80,9 @@ Message* Message::onMessage(IrcPrivateMessage *message, QVariantMap* channelStat
         html_message = html_message.arg("");
         content = content.arg("");
     }
+
     html_message.append(QString("<span class=\"timestamp\" style=\"color:#727272;\">%1 </span>").arg(QTime::currentTime().toString().mid(0,5)));
-    if((channelStates->contains("subs-only") && (*channelStates)["subs-only"].toBool()) && (!msg->subscriber || !msg->moderator || !msg->broadcaster )) {
+    if((*roomData)["subs-only"].toBool() && (!msg->subscriber || !msg->moderator || !msg->broadcaster )) {
         html_message.append(QString("<span class=\"not subscribed\" style=\"color:#727272;\">%1 </span>").arg(" This room is in subscribers only mode. To talk, purchase a channel subscription."));
         html_message.append("</div>");
         msg->message = html_message;
@@ -84,7 +91,7 @@ Message* Message::onMessage(IrcPrivateMessage *message, QVariantMap* channelStat
     }
 
     setGlobalBadges(html_message, msg);
-    setSubBadges(html_message, msg);
+    setSubBadges(html_message, msg, roomData);
     html_message.append(QString("<span class=\"username\" style=\"color: %1;\">%2</span>").arg(msg->username_color.name(), msg->username));
 
     html_message.append("<span class=\"colon\">:</span>");
@@ -129,48 +136,53 @@ void Message::setGlobalBadges(QString &html_message, Message* msg) {
     //https://badges.twitch.tv/v1/badges/global/display?language=en
     if(msg->admin) {
         html_message.append(QString("<span class =\"admin\">"
-                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/9ef7e029-4cdf-4d4d-a0d5-e2b3fb2583fe/1\" \>  "
-                                    "<\span>"));
+                                    "<img src = \"%1\"\>  "
+                                    "<\span>").arg(Resources::getBadgeAdmin()));
     }
     if(msg->bot) {
         html_message.append(QString("<span class =\"bot\">"
-                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/df9095f6-a8a0-4cc2-bb33-d908c0adffb8/1\" \>  "
-                                    "<\span>"));
+                                    "<img src = \"%1\" \>  "
+                                    "<\span>").arg(Resources::getBadgeBot()));
     }
     if(msg->broadcaster) {
         html_message.append(QString("<span class =\"broadcaster\">"
-                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/5527c58c-fb7d-422d-b71b-f309dcb85cc1/1\" \>  "
-                                    "<\span>"));
+                                    "<img src = \"%1\" \>  "
+                                    "<\span>").arg(Resources::getBadgeBroadcaster()));
     }
     else if (msg->moderator) {
         html_message.append(QString("<span class =\"moderator\">"
-                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/3267646d-33f0-4b17-b3df-f923a41db1d0/1\" \>  "
-                                    "<\span>"));
+                                    "<img src = \"%1\" \>  "
+                                    "<\span>").arg(Resources::getBadgeModerator()));
     }
     if(msg->global_moderator) {
         html_message.append(QString("<span class =\"global moderator\">"
-                                    "<img src = \"hhttps://static-cdn.jtvnw.net/badges/v1/9384c43e-4ce7-4e94-b2a1-b93656896eba/1\" \>  "
-                                    "<\span>"));
+                                    "<img src = \"%1\" \>  "
+                                    "<\span>").arg(Resources::getBadgeGlobalmod()));
     }
     if(msg->turbo) {
         html_message.append(QString("<span class =\"turbo\">"
-                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/bd444ec6-8f34-4bf9-91f4-af1e3428d80f/1\" \>  "
-                                    "<\span>"));
+                                    "<img src = \"%1\" \>  "
+                                    "<\span>").arg(Resources::getBadgeTurbo()));
     }
-    if(msg->prime) {
+    if(msg->premium) {
         html_message.append(QString("<span class =\"prime\">"
-                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/a1dd5073-19c3-4911-8cb4-c464a7bc1510/1\" \>  "
-                                    "<\span>"));
+                                    "<img src = \"%1\" \>  "
+                                    "<\span>").arg(Resources::getBadgePremium()));
     }
 
     if(msg->staff) {
         html_message.append(QString("<span class =\"staff\">"
-                                    "<img src = \"https://static-cdn.jtvnw.net/badges/v1/d97c37bd-a6f5-4c38-8f57-4e4bef88af34/1\" \>  "
-                                    "<\span>"));
+                                    "<img src = \"%1\" \>  "
+                                    "<\span>").arg(Resources::getBadgeStaff()));
     }
 }
 
-void Message::setSubBadges(QString &html_message, Message* msg)
-{
+void Message::setSubBadges(QString &html_message, Message* msg, QVariantMap* roomData)
+{ //TODO: maybe make a mapping for user and sub icon(in chatwidget)?
+    if(!msg->subscriber) return;
     //https://badges.twitch.tv/v1/badges/channels/24991333/display
+    QString roomID = roomData->value("room-id").toString();
+    if(roomID.isEmpty()) return;
+
+    QString month = roomData->value("subscriber/months").toString();
 }

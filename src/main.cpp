@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "LoginWindow/loginwindow.h"
+#include "ChatWidget/resources.h"
+
 #include <QApplication>
 #include <QSettings>
 #include <QFile>
@@ -18,6 +20,8 @@ int main(int argc, char *argv[])
     }
 
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "marvin", "chat");
+
+    Resources::load();
 
     int r = 0;
     MainWindow w;

@@ -1,6 +1,8 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
+#include "ChatWidget/channel.h"
+
 #include "mentionmanager.h"
 #include <IrcMessage>
 #include <QRegularExpression>
@@ -34,18 +36,18 @@ public:
 
     bool subMode;
     bool subscriber;
-    bool turbo, prime;
+    bool turbo, premium;
 
     static MentionManager mention_manager;
 
-    static Message* onMessage(IrcPrivateMessage *message, QVariantMap* channelStates);
+    static Message* onMessage(IrcPrivateMessage *message, Channel* channel);
     static bool variantByIndex(const struct EmoteReplacement &v1, const struct EmoteReplacement &v2);
     static int parseLinks(QString &htmlContent);
     static void parseTwitchEmotes(QString &message, QString &emotesString);
 
 private:
     static void setGlobalBadges(QString& html_message, Message* msg);
-    static void setSubBadges(QString& html_message, Message* msg);
+    static void setSubBadges(QString& html_message, Message* msg, QVariantMap* roomData);
 };
 
 struct EmoteReplacement {
