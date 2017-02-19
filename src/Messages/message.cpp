@@ -66,7 +66,7 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     QString mentionClass;
     for (int i = 0; i < mention_manager.mentions.count(); ++i) {
         Mention* mention = mention_manager.mentions.at(i);
-        if (mention->regex.captureCount() >= 0) {
+        if (mention->regex.match(message->content()).hasMatch()) {
             mentionClass = QString("data-mention=\"%1\"").arg(mention->cssclass);
             break;
         }

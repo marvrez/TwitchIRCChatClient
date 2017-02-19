@@ -64,6 +64,11 @@ void MainWindow::connectToIrc() {
     read.connect();
     write.connect();
     //TODO: IMPLEMENT
+
+    Mention* default_mention = new Mention();
+    default_mention->regex = QRegularExpression("\\b@?" + QRegularExpression::escape(write.nickName()) + "\\b");
+    default_mention->cssclass = "default";
+    Message::mention_manager.mentions.append(default_mention);
 }
 
 void MainWindow::onPrivMessageReceived(IrcPrivateMessage *message) {
