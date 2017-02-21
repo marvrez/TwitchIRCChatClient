@@ -17,7 +17,7 @@ class ChatWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit ChatWidget(QWidget *parent = 0);
+    explicit ChatWidget(QWidget* parent = 0);
     ChatWidget(QString channelName);
     //bool acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame);
 
@@ -26,11 +26,12 @@ public:
     //screen handling
     void updateMessageScreen(QList<Message*>* messages);
     void channelChanged(QList<Message*>* messages);
-    void addMessage(Message *msg);
-    void tryRemoveFirstMessage(QList<Message *> *messages);
+    void addMessage(Message* msg);
+    void tryRemoveFirstMessage(QList<Message *>* messages);
 
     ~ChatWidget();
 
+    //getters
     Channel* getChannel();
 
     //setters
@@ -39,7 +40,7 @@ private slots:
     void on_wSend_clicked();
 
 private:
-    Ui::ChatWidget *ui;
+    Ui::ChatWidget* ui;
 
     int messageCount = 150;
     QString channelName;

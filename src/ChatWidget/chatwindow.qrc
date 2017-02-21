@@ -2,6 +2,5 @@
     <qresource prefix="/ChatWindow">
         <file>index.html</file>
         <file>style.css</file>
-        <file>chat.png</file>
     </qresource>
 </RCC>

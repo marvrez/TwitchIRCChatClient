@@ -33,6 +33,7 @@ LoginWindow::LoginWindow(QWidget *parent) :
 
 LoginWindow::~LoginWindow(){
     delete ui;
+    delete webView;
 }
 
 void LoginWindow::on_btnLogin_clicked(){

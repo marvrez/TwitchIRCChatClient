@@ -40,8 +40,8 @@ HEADERS  += src/mainwindow.h \
 
 RESOURCES += lib/QDarkStyleSheet/qdarkstyle/style.qrc \
              resources/loginwindow.qrc \
-             src/ChatWidget/chatwindow.qrc \
-    src/ChatWidget/chatwindow.qrc
+    src/ChatWidget/chatwindow.qrc \
+    resources/badges/badges.qrc
 
 FORMS    += src/ui/mainwindow.ui \
     src/ui/loginwindow.ui \

@@ -120,7 +120,7 @@ void MainWindow::addTab(const QString channel) {
 
 void MainWindow::on_tabWidget_tabCloseRequested(int index) {
     if(ui->tabWidget->count() > 1 && index != ui->tabWidget->count()-1) {
-        QString channelName = ui->tabWidget->tabText(index);
+        QString channelName = "#" + ui->tabWidget->tabText(index);
 
         write.removeChannel(channelName);
         read.removeChannel(channelName);

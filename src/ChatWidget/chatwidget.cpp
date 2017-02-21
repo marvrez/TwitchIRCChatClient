@@ -94,6 +94,8 @@ void ChatWidget::channelChanged(QList<Message*> *messages) {
 
 ChatWidget::~ChatWidget() {
     delete ui;
+    qDebug() << "DELETED" << this->channelName;
+    delete channel;
 }
 
 Channel *ChatWidget::getChannel() {

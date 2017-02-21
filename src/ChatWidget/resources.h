@@ -1,12 +1,16 @@
 #ifndef RESOURCES_H
 #define RESOURCES_H
 
+#include <QColor>
 #include <QString>
 
 class Resources
 {
 public:
     static void load();
+
+    static QColor calculateColorReplacement(QColor color, QColor backgroundColor = QColor(0,0,0));
+
     // badges
     static QString  getBadgeStaff(){
         return badgeStaff;
@@ -41,6 +45,7 @@ public:
 
 private:
     Resources();
+    static QString calculateColorBackground(QColor color);
     static QString  badgeStaff;
     static QString  badgeAdmin;
     static QString  badgeBot;

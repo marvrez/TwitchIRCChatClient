@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/badges">
+        <file>admin.png</file>
+        <file>badges.qrc</file>
+        <file>broadcaster.png</file>
+        <file>globalmod.png</file>
+        <file>moderator.png</file>
+        <file>premium.png</file>
+        <file>staff.png</file>
+        <file>turbo.png</file>
+    </qresource>
+</RCC>
