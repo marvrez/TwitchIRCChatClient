@@ -41,21 +41,31 @@ void Resources::load() {
     */
 }
 
+QColor Resources::calculateColor(QColor color) {
+    while (calculateColorBackground(color) == "light")
+        color = calculateColorReplacement(color, calculateColorBackground(color));
+    return color;
+}
+
 QString Resources::calculateColorBackground(QColor color) {
     // Converts HEX to YIQ to judge what color background the color would look best on
     int r = color.red();
     int g = color.green();
     int b = color.blue();
     double yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    return (yiq >= 128) ? "dark" : "light"; //dark = 1, light = 0
+    return (yiq >= 128) ? "dark" : "light";
 }
 
-QColor Resources::calculateColorReplacement(QColor color, QColor background) {
+QColor Resources::calculateColorReplacement(QColor color, QString backgroundColor) {
+    bool light = backgroundColor == "light";
     double r = color.red() / 255, g = color.green() / 255, b = color.blue() / 255;
-    double factor = 0.1, h = color.hslHueF(), s = color.hslSaturationF(),
-            l = (std::max(r,std::max(g,b)) + std::min(r,std::min(g,b)))/2;
-    double newL =  1 - (1 - factor) * (1 - l);
-    newL = std::min(std::max(0.0, newL), 1.0);
-    qDebug() << h << s << l << Resources::calculateColorBackground(color);
+    double factor = light ? 0.1 : -0.1,
+            h = color.hslHueF(),
+            s = color.hslSaturationF(),
+            l = color.lightnessF();
+    //lightens dark colors, while still not affecting pure black.
+    l = light ? 1 - ((1 - factor) * (1 - l)) : (1 + factor) * l;
+    l = std::min(std::max(0.0, l), 1.0);
+    color.setHslF(h, s, l);
     return color;
 }

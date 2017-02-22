@@ -9,7 +9,7 @@ class Resources
 public:
     static void load();
 
-    static QColor calculateColorReplacement(QColor color, QColor backgroundColor = QColor(0,0,0));
+    static QColor calculateColor(QColor color);
 
     // badges
     static QString  getBadgeStaff(){
@@ -46,6 +46,7 @@ public:
 private:
     Resources();
     static QString calculateColorBackground(QColor color);
+    static QColor calculateColorReplacement(QColor color, QString backgroundColor);
     static QString  badgeStaff;
     static QString  badgeAdmin;
     static QString  badgeBot;

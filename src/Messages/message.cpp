@@ -28,8 +28,8 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
 
     //set color
     QString colorString = tags["color"].toString();
-    Resources::calculateColorReplacement(QColor(colorString), QColor());
-    msg->username_color = (colorString.length() == 0) ? QColor("#00f0a0") : QColor(colorString);
+    msg->username_color = (colorString.length() == 0) ? Resources::calculateColor(QColor("#00f0a0")) :
+                                                        Resources::calculateColor(QColor(colorString));
 
     //check if submode is on
     if(tags.find("subscriber") != tags.end())
