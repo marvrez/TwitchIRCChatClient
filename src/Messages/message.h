@@ -44,8 +44,13 @@ public:
 
     static Message* onMessage(IrcPrivateMessage *message, Channel* channel);
     static bool twitchEmoteComparator(const struct EmoteReplacement &v1, const struct EmoteReplacement &v2);
+
     static int parseLinks(QString &htmlContent);
     static void parseTwitchEmotes(QString &message, QString &emotesString);
+    static void parseBttvEmotes(QString& html_message);
+    static void parseBttvChannelEmotes(QString& html_message, const QString channel);
+    static void parseFfzEmotes(QString& html_message);
+    static void parseFfzChannelEmotes(QString& html_message, const QString channel);
 
 private:
     static void setGlobalBadges(QString& html_message, Message* msg);

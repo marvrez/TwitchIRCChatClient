@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+
 #include "LoginWindow/loginwindow.h"
 #include "ChatWidget/resources.h"
 
@@ -22,6 +23,8 @@ int main(int argc, char *argv[])
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "marvin", "chat");
 
     Resources::load();
+    Message::emote_manager.loadBttvEmotes();
+    Message::emote_manager.loadFfzEmotes();
     //Message::emote_manager.getTwitchEmotes();
 
     int r = 0;

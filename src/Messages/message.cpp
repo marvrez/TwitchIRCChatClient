@@ -1,4 +1,5 @@
 #include "message.h"
+
 #include "ChatWidget/chatwidget.h"
 #include <ChatWidget/resources.h>
 #include "emotemanager.h"
@@ -33,9 +34,10 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     msg->username_color = (colorString.length() == 0) ? Resources::calculateColor(QColor("#00f0a0")) :
                                                         Resources::calculateColor(QColor(colorString));
 
+
     //check if submode is on
     if(tags.find("subscriber") != tags.end())
-        msg->subMode = tags["subscriber"].toBool();
+        msg->subscriber = true;
 
 
     //get badges
@@ -69,6 +71,11 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
         parseTwitchEmotes(html_content, emotesString);
     else
         html_content = html_content.replace("<", "&lt;").replace(">", "&gt;");
+
+    parseBttvEmotes(html_content);
+    //parseBttvChannelEmotes(html_content, message->target());
+    parseFfzEmotes(html_content);
+    //parseFfzChannelEmotes(html_content, message->target());
     parseLinks(html_content);
 
     QString mentionClass;
@@ -91,7 +98,7 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     }
 
     html_message.append(QString("<span class=\"timestamp\" style=\"color:#727272;\">%1 </span>").arg(QTime::currentTime().toString().mid(0,5)));
-    if((*roomData)["subs-only"].toBool() && (!msg->subscriber || !msg->moderator || !msg->broadcaster )) {
+    if((*roomData)["subs-only"].toBool() && !(msg->subscriber || msg->moderator || msg->broadcaster )) {
         html_message.append(QString("<span class=\"not subscribed\" style=\"color:#727272;\">%1 </span>").arg(" This room is in subscribers only mode. To talk, purchase a channel subscription."));
         html_message.append("</div>");
         msg->message = html_message;
@@ -138,7 +145,7 @@ int Message::parseLinks(QString &html_content) {
 }
 
 void Message::parseTwitchEmotes(QString &message, QString &emotesString) {
-    QStringList unique_emotes = emotesString.split('/'); //gets the emotes and their positions in the content string
+    QStringList unique_emotes = emotesString.split('/'); //gets the emotes and their positions in the emotes string
     QList<struct EmoteReplacement> replacements;
     for(auto unique_emote : unique_emotes) {
         int emote_id = unique_emote.section(":", 0, 0).toInt();
@@ -158,7 +165,7 @@ void Message::parseTwitchEmotes(QString &message, QString &emotesString) {
         for(int i = last_i + offset; i < replacement.index + offset; ++i) {
             const QChar &c = message[i];
             if (c.isHighSurrogate()) offset += 1; //check if c is utf16
-            if (c == '>' || c == '<') offset += 3;
+            if (c == '>' || c == '<') offset += 3; //just so emotes arent out of position
             //fix html entities
             if (c == '>') message = message.replace(i, 1, "&gt;");
             if (c == '<') message = message.replace(i, 1, "&lt;");
@@ -166,14 +173,52 @@ void Message::parseTwitchEmotes(QString &message, QString &emotesString) {
         last_i = replacement.index + replacement.length;
         message = message.replace(replacement.index + offset, replacement.length, replacement.tag);
         offset += replacement.tag.length() - replacement.length;
-
+/*
         for (int i = last_i+offset; i < message.length(); ++i) {
             const QChar &c = message[i];
             if (c == '>') message = message.replace(i, 1, "&gt;");
             if (c == '<') message = message.replace(i, 1, "&lt;");
-        }
+        }*/
     }
 
+}
+
+void Message::parseBttvEmotes(QString &html_message) {
+    for(auto emote : emote_manager.getBttvEmotes()) {
+        QString img_tag = QString("<img src=\"https://cdn.betterttv.net/emote/%1/1x\" alt=\"%2\"/>")
+                                 .arg(emote.id).arg(emote.code);
+        html_message.replace(emote.regex, img_tag);
+    }
+}
+
+void Message::parseBttvChannelEmotes(QString &html_message, const QString channel) {
+    auto bttvChannelEmotes = emote_manager.getBttvChannelEmotes();
+    if(bttvChannelEmotes.contains(channel)) {
+        for(auto emote : bttvChannelEmotes.value(channel)) {
+            QString img_tag = QString("<img src=\"https://cdn.betterttv.net/emote/%1/1x\" alt=\"%2\"/>")
+                                   .arg(emote.id).arg(emote.code);
+            html_message.replace(emote.regex, img_tag);
+        }
+    }
+}
+
+void Message::parseFfzEmotes(QString &html_message) {
+    for(auto emote : emote_manager.getFfzEmotes()) {
+        QString img_tag = QString("<img src=\"https://cdn.frankerfacez.com/emoticon/%1/1\" alt=\"%2\"/>")
+                                 .arg(emote.id).arg(emote.code);
+        html_message.replace(emote.regex, img_tag);
+    }
+}
+
+void Message::parseFfzChannelEmotes(QString &html_message, const QString channel) {
+    auto ffzChannelEmotes = emote_manager.getFfzChannelEmotes();
+    if(ffzChannelEmotes.contains(channel)) {
+        for(auto emote : ffzChannelEmotes.value(channel)) {
+            QString img_tag = QString("<img src=\"https://cdn.frankerfacez.com/emoticon/%1/1\" alt=\"%2\"/>")
+                                     .arg(emote.id).arg(emote.code);
+            html_message.replace(emote.regex, img_tag);
+        }
+    }
 }
 
 void Message::setGlobalBadges(QString &html_message, Message* msg) {

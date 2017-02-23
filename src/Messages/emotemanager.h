@@ -7,15 +7,15 @@
 
 class BttvEmote {
 public:
-    BttvEmote(QString _hash, QString _code);
+    BttvEmote(QString _id, QString _code);
 
-    QString hash, code;
+    QString id, code;
     QRegularExpression regex;
 };
 
 class FfzEmote {
 public:
-    FfzEmote(QString _id, QString _code );
+    FfzEmote(int _id, QString _code );
 
     int id;
     QString code;
@@ -27,7 +27,10 @@ class EmoteManager : public QObject
     Q_OBJECT
 public:
     //void getTwitchEmotes();
-
+    void loadBttvEmotes();
+    void loadFfzEmotes();
+    void loadBttvChannelEmotes(const QString channel);
+    void loadFfzChannelEmotes(const QString channel);
     //getters of variables
     QMap<QString, QList<BttvEmote> > getBttvChannelEmotes() const;
     QMap<QString, QList<FfzEmote> > getFfzChannelEmotes() const;
@@ -41,10 +44,9 @@ private:
     QMap<QString, QList<BttvEmote> > bttvChannelEmotes;
     QMap<QString, QList<FfzEmote> > ffzChannelEmotes;
 
+    //global emotes
     QList<BttvEmote> bttvEmotes;
     QList<FfzEmote> ffzEmotes;
-
-    QNetworkAccessManager network_access_manager;
 };
 
 #endif // EMOTEMANAGER_H

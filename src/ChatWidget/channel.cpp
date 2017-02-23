@@ -1,4 +1,5 @@
 #include "channel.h"
+
 #include "mainwindow.h"
 
 #include <IrcMessage>

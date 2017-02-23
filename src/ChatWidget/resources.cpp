@@ -1,4 +1,5 @@
 #include "resources.h"
+
 #include <QDebug>
 #include <algorithm>
 

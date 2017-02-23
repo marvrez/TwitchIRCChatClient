@@ -1,4 +1,5 @@
 #include "chatwidget.h"
+
 #include "ui_chatwidget.h"
 #include "mainwindow.h"
 
@@ -46,6 +47,8 @@ ChatWidget::ChatWidget(QWidget *parent) :
 ChatWidget::ChatWidget(QString channelName) : ChatWidget(){
     this->channelName = channelName;
     channel = new Channel(channelName);
+    Message::emote_manager.loadBttvChannelEmotes(channelName);
+    Message::emote_manager.loadFfzChannelEmotes(channelName);
 }
 
 void ChatWidget::addMessage(Message *msg) {
