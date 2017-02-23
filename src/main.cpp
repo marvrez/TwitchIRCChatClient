@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "marvin", "chat");
 
     Resources::load();
+    //Message::emote_manager.getTwitchEmotes();
 
     int r = 0;
     MainWindow w;

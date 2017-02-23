@@ -26,7 +26,8 @@ SOURCES += src/main.cpp\
     src/Messages/message.cpp \
     src/ChatWidget/chatwidget.cpp \
     src/ChatWidget/resources.cpp \
-    src/ChatWidget/channel.cpp
+    src/ChatWidget/channel.cpp \
+    src/Messages/emotemanager.cpp
 
 HEADERS  += src/mainwindow.h \
     src/LoginWindow/loginwindow.h \
@@ -36,7 +37,8 @@ HEADERS  += src/mainwindow.h \
     src/Messages/mentionmanager.h \
     src/ChatWidget/chatwidget.h \
     src/ChatWidget/resources.h \
-    src/ChatWidget/channel.h
+    src/ChatWidget/channel.h \
+    src/Messages/emotemanager.h
 
 RESOURCES += lib/QDarkStyleSheet/qdarkstyle/style.qrc \
              resources/loginwindow.qrc \

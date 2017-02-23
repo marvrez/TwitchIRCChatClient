@@ -1,6 +1,7 @@
 #include "message.h"
 #include "ChatWidget/chatwidget.h"
 #include <ChatWidget/resources.h>
+#include "emotemanager.h"
 
 #include <QRegularExpression>
 #include <QUrl>
@@ -12,6 +13,7 @@
 
 //static variables
 MentionManager Message::mention_manager;
+EmoteManager Message::emote_manager;
 
 Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     Message *msg = new Message();
@@ -62,6 +64,11 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     QString emotesString = tags["emotes"].toString();
     QString html_content = message->content();
 
+
+    if (emotesString.length() > 0)
+        parseTwitchEmotes(html_content, emotesString);
+    else
+        html_content = html_content.replace("<", "&lt;").replace(">", "&gt;");
     parseLinks(html_content);
 
     QString mentionClass;
@@ -110,7 +117,7 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     return msg;
 }
 
-bool Message::variantByIndex(const EmoteReplacement &v1, const EmoteReplacement &v2) {
+bool Message::twitchEmoteComparator(const EmoteReplacement &v1, const EmoteReplacement &v2) {
     return v1.index < v2.index;
 }
 
@@ -131,6 +138,41 @@ int Message::parseLinks(QString &html_content) {
 }
 
 void Message::parseTwitchEmotes(QString &message, QString &emotesString) {
+    QStringList unique_emotes = emotesString.split('/'); //gets the emotes and their positions in the content string
+    QList<struct EmoteReplacement> replacements;
+    for(auto unique_emote : unique_emotes) {
+        int emote_id = unique_emote.section(":", 0, 0).toInt();
+        QStringList emote_positions = unique_emote.section(":", 1, 1).split(",");
+        for(auto emote_position : emote_positions) {
+            unsigned int begin = emote_position.section("-",0,0).toInt(),
+                end   = emote_position.section("-",1,1).toInt();
+            QString img_tag = QString("<img src=\"http://static-cdn.jtvnw.net/emoticons/v1/%1/1.0\" />").arg(emote_id);
+            replacements.append(EmoteReplacement(begin, end-begin+1,img_tag));
+        }
+    }
+
+    int offset = 0, last_i = 0;
+    qSort(replacements.begin(), replacements.end(), twitchEmoteComparator);
+
+    for(auto replacement : replacements) {
+        for(int i = last_i + offset; i < replacement.index + offset; ++i) {
+            const QChar &c = message[i];
+            if (c.isHighSurrogate()) offset += 1; //check if c is utf16
+            if (c == '>' || c == '<') offset += 3;
+            //fix html entities
+            if (c == '>') message = message.replace(i, 1, "&gt;");
+            if (c == '<') message = message.replace(i, 1, "&lt;");
+        }
+        last_i = replacement.index + replacement.length;
+        message = message.replace(replacement.index + offset, replacement.length, replacement.tag);
+        offset += replacement.tag.length() - replacement.length;
+
+        for (int i = last_i+offset; i < message.length(); ++i) {
+            const QChar &c = message[i];
+            if (c == '>') message = message.replace(i, 1, "&gt;");
+            if (c == '<') message = message.replace(i, 1, "&lt;");
+        }
+    }
 
 }
 
@@ -138,43 +180,43 @@ void Message::setGlobalBadges(QString &html_message, Message* msg) {
     //https://badges.twitch.tv/v1/badges/global/display?language=en
     if(msg->admin) {
         html_message.append(QString("<span class =\"admin\">"
-                                    "<img src = \"%1\"\>  "
+                                    "<img src = \"%1\" style = \"vertical-align:-4.5px;\"\>  "
                                     "<\span>").arg(Resources::getBadgeAdmin()));
     }
     if(msg->bot) {
         html_message.append(QString("<span class =\"bot\">"
-                                    "<img src = \"%1\" \>  "
+                                    "<img src = \"%1\" style = \"vertical-align:-4.5px;\" \>  "
                                     "<\span>").arg(Resources::getBadgeBot()));
     }
     if(msg->broadcaster) {
         html_message.append(QString("<span class =\"broadcaster\">"
-                                    "<img src = \"%1\" \>  "
+                                    "<img src = \"%1\" style = \"vertical-align:-4.5px;\" \>  "
                                     "<\span>").arg(Resources::getBadgeBroadcaster()));
     }
     else if (msg->moderator) {
         html_message.append(QString("<span class =\"moderator\">"
-                                    "<img src = \"%1\" \>  "
+                                    "<img src = \"%1\" style = \"vertical-align:-4.5px;\" \>  "
                                     "<\span>").arg(Resources::getBadgeModerator()));
     }
     if(msg->global_moderator) {
         html_message.append(QString("<span class =\"global moderator\">"
-                                    "<img src = \"%1\" \>  "
+                                    "<img src = \"%1\" style = \"vertical-align:-4.5px;\" \>  "
                                     "<\span>").arg(Resources::getBadgeGlobalmod()));
     }
     if(msg->turbo) {
         html_message.append(QString("<span class =\"turbo\">"
-                                    "<img src = \"%1\" \>  "
+                                    "<img src = \"%1\" style = \"vertical-align:-4.5px;\" \>  "
                                     "<\span>").arg(Resources::getBadgeTurbo()));
     }
     if(msg->premium) {
         html_message.append(QString("<span class =\"prime\">"
-                                    "<img src = \"%1\" \>  "
+                                    "<img src = \"%1\" style = \"vertical-align:-4.5px;\" \>  "
                                     "<\span>").arg(Resources::getBadgePremium()));
     }
 
     if(msg->staff) {
         html_message.append(QString("<span class =\"staff\">"
-                                    "<img src = \"%1\" \>  "
+                                    "<img src = \"%1\" \> style = \"vertical-align:-4.5px;\"  "
                                     "<\span>").arg(Resources::getBadgeStaff()));
     }
 }
@@ -183,6 +225,6 @@ void Message::setSubBadges(QString &html_message, bool subscriber, QString subBa
     //https://badges.twitch.tv/v1/badges/channels/24991333/display
     if(!subscriber || subBadge.isEmpty()) return;
     html_message.append(QString("<span class =\"sub-badge\">"
-                                "<img src = \"%1\" \>  "
+                                "<img src = \"%1\" style = \"vertical-align:-4.5px;\" \>  "
                                 "<\span>").arg(subBadge));
 }

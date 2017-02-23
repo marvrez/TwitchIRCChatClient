@@ -3,6 +3,7 @@
 
 #include "ChatWidget/chatwidget.h"
 #include "ircmanager.h"
+#include "Messages/emotemanager.h"
 
 #include <QMainWindow>
 #include <IrcMessage>
