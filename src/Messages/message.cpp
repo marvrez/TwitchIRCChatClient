@@ -73,7 +73,7 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
         html_content = html_content.replace("<", "&lt;").replace(">", "&gt;");
 
     parseBttvEmotes(html_content);
-    //parseBttvChannelEmotes(html_content, message->target());
+    parseBttvChannelEmotes(html_content, message->target());
     parseFfzEmotes(html_content);
     //parseFfzChannelEmotes(html_content, message->target());
     parseLinks(html_content);

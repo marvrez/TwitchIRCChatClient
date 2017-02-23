@@ -72,11 +72,47 @@ void EmoteManager::loadFfzEmotes() {
                 nam->deleteLater();
             }
     });
-
 }
 
 void EmoteManager::loadBttvChannelEmotes(const QString channel) {
     //https://api.betterttv.net/2/channels/{channel_name}
+    QUrl url = QUrl(QString("https://api.betterttv.net/2/channels/%1")
+                           .arg(channel.right(channel.length() - 1)));
+
+    QNetworkAccessManager* nam = new QNetworkAccessManager();
+    QNetworkRequest req(url);
+    QNetworkReply *reply = nam->get(req);
+
+    QList<BttvEmote> *list;
+
+    if (this->bttvChannelEmotes.contains(channel))
+        list = &this->bttvChannelEmotes[channel];
+    else {
+        this->bttvChannelEmotes.value(channel, QList<BttvEmote>());
+        list = &this->bttvChannelEmotes[channel];
+    }
+
+    QObject::connect(reply,
+                     &QNetworkReply::finished,
+                     [=]() {
+                         if(reply->error() == QNetworkReply::NetworkError::NoError) {
+                             QByteArray data = reply->readAll();
+
+                             QJsonDocument jsonDoc(QJsonDocument::fromJson(data));
+                             QJsonObject root = jsonDoc.object();
+
+                             QJsonArray emotes = root.value("emotes").toArray();
+                             //QString urlTemplate = "https:" + root.value("urlTemplate").toString();
+                             for(auto emote : emotes) {
+                                 QString id = emote.toObject().value("id").toString(),
+                                         code = emote.toObject().value("code").toString();
+                                 list->push_back(BttvEmote(id,code));
+                             }
+                         }
+                         reply->deleteLater();
+                         nam->deleteLater();
+                         qDebug() << "LOADED BTTV CHANNEL EMOTE FROM CHANNEL" << channel;
+                     });
 }
 
 void EmoteManager::loadFfzChannelEmotes(const QString channel) {

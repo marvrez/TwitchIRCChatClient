@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
     Resources::load();
     Message::emote_manager.loadBttvEmotes();
     Message::emote_manager.loadFfzEmotes();
+    Message::emote_manager.loadBttvChannelEmotes("#pajlada");
     //Message::emote_manager.getTwitchEmotes();
 
     int r = 0;
