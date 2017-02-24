@@ -126,7 +126,9 @@ void ChatWidget::on_wSend_clicked() {
         this->updateMessageScreen(messages);
         this->addMessage(newNotice);
     }
+
     else
         MainWindow::write.sendMessage(this->channelName, this->ui->wInput->text());
+
     this->ui->wInput->clear();
 }

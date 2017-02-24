@@ -43,6 +43,7 @@ public:
     static EmoteManager emote_manager;
 
     static Message* onMessage(IrcPrivateMessage *message, Channel* channel);
+    static Message* onResubMessage();
     static Message* createNotSubscribedMessage();
     static bool twitchEmoteComparator(const struct EmoteReplacement &v1, const struct EmoteReplacement &v2);
 

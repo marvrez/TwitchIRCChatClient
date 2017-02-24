@@ -32,6 +32,12 @@ int main(int argc, char *argv[])
     Message::emote_manager.loadBttvChannelEmotes("#imaqtpie");
     Message::emote_manager.loadBttvChannelEmotes("#gapbi4");
     Message::emote_manager.loadBttvChannelEmotes("#gapbl4");
+
+    Message::emote_manager.loadFfzChannelEmotes("#pajlada");
+    Message::emote_manager.loadFfzChannelEmotes("#forsenlol");
+    Message::emote_manager.loadFfzChannelEmotes("#imaqtpie");
+    Message::emote_manager.loadFfzChannelEmotes("#gapbi4");
+    Message::emote_manager.loadFfzChannelEmotes("#gapbl4");
     //Message::emote_manager.getTwitchEmotes();
 
     int r = 0;

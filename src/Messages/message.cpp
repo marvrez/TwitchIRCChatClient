@@ -131,6 +131,10 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     return msg;
 }
 
+Message *Message::onResubMessage() {
+
+}
+
 Message *Message::createNotSubscribedMessage() {
     Message* msg = new Message();
     QString html_message = QString("<div class=\"message\">");

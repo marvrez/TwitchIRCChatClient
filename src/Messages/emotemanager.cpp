@@ -111,12 +111,50 @@ void EmoteManager::loadBttvChannelEmotes(const QString channel) {
                          }
                          reply->deleteLater();
                          nam->deleteLater();
-                         qDebug() << "LOADED BTTV CHANNEL EMOTE FROM CHANNEL" << channel;
+                         qDebug() << "LOADED BTTV CHANNELEMOTES FROM CHANNEL" << channel;
                      });
 }
 
 void EmoteManager::loadFfzChannelEmotes(const QString channel) {
     //http://api.frankerfacez.com/v1/room/{channel_name}
+    QUrl url = QUrl(QString("http://api.frankerfacez.com/v1/room/%1")
+                           .arg(channel.right(channel.length() - 1)));
+    QNetworkAccessManager* nam = new QNetworkAccessManager();
+    QNetworkRequest req(url);
+    QNetworkReply *reply = nam->get(req);
+
+    QList<FfzEmote> *list;
+
+    if (this->ffzChannelEmotes.contains(channel))
+        list = &this->ffzChannelEmotes[channel];
+    else {
+        this->ffzChannelEmotes.value(channel, QList<FfzEmote>());
+        list = &this->ffzChannelEmotes[channel];
+    }
+    QObject::connect(reply,
+                     &QNetworkReply::finished,
+                     [=]() {
+                         if(reply->error() == QNetworkReply::NetworkError::NoError) {
+                             QByteArray data = reply->readAll();
+                             QJsonDocument jsonDoc(QJsonDocument::fromJson(data));
+                             QJsonObject root = jsonDoc.object();
+
+                             auto sets = root.value("sets").toObject();
+                             for(const QJsonValue &set : sets) {
+                                 QJsonArray emotes = set.toObject().value("emoticons").toArray();
+                                 for(const QJsonValue &emote : emotes) {
+                                    QJsonObject object = emote.toObject();
+
+                                    int id = object.value("id").toInt();
+                                    QString code = object.value("name").toString();
+                                    list->push_back(FfzEmote(id,code));
+                                 }
+                             }
+                         }
+                         nam->deleteLater();
+                         reply->deleteLater();
+                         qDebug() << "LOADED FFZ CHANNELEMOTES FROM CHANNEL" << channel;
+                     });
 }
 
 QMap<QString, QList<BttvEmote> > EmoteManager::getBttvChannelEmotes() const {

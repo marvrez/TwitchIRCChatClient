@@ -49,7 +49,6 @@ void Channel::loadSubBadges(QString roomID) {
                     QString link = it.value().toMap().value("image_url_2x").toString();
                     subBadges.insert(QString("subscriber/%1").arg(it.key()), link);
             }
-            qDebug() << subBadges;
         });
         subBadgesLoaded = true;
     }
@@ -91,7 +90,6 @@ void Channel::onMessageReceived(IrcMessage *message) {
             if(tags.contains("turbo"))
                 turbo = tags["mod"].toBool();
             user_state = new UserState(displayName, mod, sub, turbo);
-            qDebug() << displayName << "MOD: " << mod << "SUB: " << sub << "TURBO: " << turbo;
         }
         else if (message->command() == "CLEARCHAT") {
             //TODO
