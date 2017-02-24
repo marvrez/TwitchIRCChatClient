@@ -75,8 +75,14 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     parseBttvEmotes(html_content);
     parseBttvChannelEmotes(html_content, message->target());
     parseFfzEmotes(html_content);
-    //parseFfzChannelEmotes(html_content, message->target());
+    parseFfzChannelEmotes(html_content, message->target());
     parseLinks(html_content);
+/*
+    for(auto c : Resources::channels) {
+        qDebug() << c;
+        parseBttvChannelEmotes(html_content,"#" + c);
+        parseFfzChannelEmotes(html_content, "#" + c);
+    }*/
 
     QString mentionClass;
     for (int i = 0; i < mention_manager.mentions.count(); ++i) {
@@ -98,13 +104,14 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     }
 
     html_message.append(QString("<span class=\"timestamp\" style=\"color:#727272;\">%1 </span>").arg(QTime::currentTime().toString().mid(0,5)));
+    /*
     if((*roomData)["subs-only"].toBool() && !(msg->subscriber || msg->moderator || msg->broadcaster )) {
         html_message.append(QString("<span class=\"not subscribed\" style=\"color:#727272;\">%1 </span>").arg(" This room is in subscribers only mode. To talk, purchase a channel subscription."));
         html_message.append("</div>");
         msg->message = html_message;
         msg->action = message->isAction();
         return msg;
-    }
+    }*/
 
     setGlobalBadges(html_message, msg);
     setSubBadges(html_message, msg->subscriber, channel->getSubBadges().value(subBadge));
@@ -121,6 +128,15 @@ Message* Message::onMessage(IrcPrivateMessage *message, Channel* channel) {
     msg->message = html_message;
 
     msg->action = message->isAction();
+    return msg;
+}
+
+Message *Message::createNotSubscribedMessage() {
+    Message* msg = new Message();
+    QString html_message = QString("<div class=\"message\">");
+    html_message.append(QString("<span class=\"not subscribed\" style=\"color:#727272;\">%1 </span>").arg(" This room is in subscribers only mode. To talk, purchase a channel subscription."));
+    html_message.append("</div>");
+    msg->message = html_message;
     return msg;
 }
 

@@ -43,6 +43,9 @@ public:
         return badgeBot;
     }
 
+    static QList<QString> channels;
+
+    static void setChannels();
 private:
     Resources();
     static QString calculateColorBackground(QColor color);

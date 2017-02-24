@@ -13,6 +13,15 @@ QString Resources::badgePremium;
 QString Resources::badgeStaff;
 QString Resources::badgeTurbo;
 
+QList<QString> Resources::channels;
+
+void Resources::setChannels() {
+    channels.push_back("pajlada");
+    channels.push_back("imaqtpie");
+    channels.push_back("forsenlol");
+    channels.push_back("gapbi4");
+    channels.push_back("gapbl4");
+}
 
 Resources::Resources(){
 

@@ -19,10 +19,10 @@ body {
     position: relative;
     word-wrap: break-word;
 }
-
+/*
 .message:nth-child(2n) {
     background: rgb(40, 39, 39);
-}
+}*/
 
 .message.action .colon {
     display: none;

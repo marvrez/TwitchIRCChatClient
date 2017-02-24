@@ -23,9 +23,15 @@ int main(int argc, char *argv[])
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "marvin", "chat");
 
     Resources::load();
+    Resources::setChannels();
     Message::emote_manager.loadBttvEmotes();
     Message::emote_manager.loadFfzEmotes();
+
     Message::emote_manager.loadBttvChannelEmotes("#pajlada");
+    Message::emote_manager.loadBttvChannelEmotes("#forsenlol");
+    Message::emote_manager.loadBttvChannelEmotes("#imaqtpie");
+    Message::emote_manager.loadBttvChannelEmotes("#gapbi4");
+    Message::emote_manager.loadBttvChannelEmotes("#gapbl4");
     //Message::emote_manager.getTwitchEmotes();
 
     int r = 0;

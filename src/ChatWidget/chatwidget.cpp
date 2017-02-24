@@ -114,6 +114,19 @@ void ChatWidget::chatContentsSizeChanged(const QSize &size) {
 }
 
 void ChatWidget::on_wSend_clicked() {
-    MainWindow::write.sendMessage(this->channelName, this->ui->wInput->text());
+    UserState* user_state = channel->getUserState();
+    if(channel->getRoomData()->value("subs-only").toBool() &&
+       (!user_state->isMod() || !user_state->isSub() ||
+        channelName.right(channelName.length() - 1) != user_state->getDisplayName()))
+    {
+        QList<Message*> *messages = MainWindow::read.getMessages(this->channelName);
+        Message* newNotice = Message::createNotSubscribedMessage();
+        messages->append(newNotice);
+
+        this->updateMessageScreen(messages);
+        this->addMessage(newNotice);
+    }
+    else
+        MainWindow::write.sendMessage(this->channelName, this->ui->wInput->text());
     this->ui->wInput->clear();
 }

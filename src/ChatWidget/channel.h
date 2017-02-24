@@ -1,6 +1,8 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
+#include "userstate.h"
+
 #include <IrcMessage>
 #include <QMap>
 #include <QNetworkAccessManager>
@@ -14,7 +16,7 @@ class Channel : public QObject
 
 public:
     explicit Channel(QObject *parent = nullptr);
-    Channel(QString channelName);
+    Channel(QString channel_name);
 
     QMap<QString, QString> getSubBadges();
     QVariantMap* getRoomData();
@@ -24,11 +26,14 @@ public:
     Channel& operator=(Channel channel);
     ~Channel();
 
+    UserState* getUserState() const;
+
 private slots:
     void onMessageReceived(IrcMessage *message);
 
 private:
-    QString channelName;
+    QString channel_name;
+    UserState* user_state;
 
     QNetworkAccessManager network_access_manager;
 
