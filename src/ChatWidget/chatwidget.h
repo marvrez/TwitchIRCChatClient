@@ -3,6 +3,7 @@
 
 #include "Messages/message.h"
 #include "channel.h"
+#include "resizingtextedit.h"
 
 #include <QDialog>
 #include <QWebView>

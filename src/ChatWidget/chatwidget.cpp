@@ -39,7 +39,7 @@ ChatWidget::ChatWidget(QWidget *parent) :
                      this,
                      &ChatWidget::chatContentsSizeChanged);
     QObject::connect(this->ui->wInput,
-                     &QLineEdit::returnPressed,
+                     &ResizingTextEdit::returnPressed,
                      this->ui->wSend,
                      &QPushButton::click);
 }
@@ -128,7 +128,7 @@ void ChatWidget::on_wSend_clicked() {
     }
 
     else
-        MainWindow::write.sendMessage(this->channelName, this->ui->wInput->text());
+        MainWindow::write.sendMessage(this->channelName, this->ui->wInput->toPlainText());
 
     this->ui->wInput->clear();
 }

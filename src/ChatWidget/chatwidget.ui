@@ -34,18 +34,21 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QLineEdit" name="wInput">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
+        <widget class="ResizingTextEdit" name="wInput">
+         <property name="mouseTracking">
+          <bool>true</bool>
+         </property>
+         <property name="acceptDrops">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>Send a message</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="placeholderText">
           <string>Send a message</string>
-         </property>
-         <property name="cursorMoveStyle">
-          <enum>Qt::LogicalMoveStyle</enum>
-         </property>
-         <property name="clearButtonEnabled">
-          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -100,6 +103,11 @@
    <class>QWebView</class>
    <extends>QWidget</extends>
    <header location="global">QtWebKitWidgets/QWebView</header>
+  </customwidget>
+  <customwidget>
+   <class>ResizingTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header location="global">ChatWidget/resizingtextedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

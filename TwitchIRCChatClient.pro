@@ -28,7 +28,8 @@ SOURCES += src/main.cpp\
     src/ChatWidget/resources.cpp \
     src/ChatWidget/channel.cpp \
     src/Messages/emotemanager.cpp \
-    src/ChatWidget/userstate.cpp
+    src/ChatWidget/userstate.cpp \
+    src/ChatWidget/resizingtextedit.cpp
 
 HEADERS  += src/mainwindow.h \
     src/LoginWindow/loginwindow.h \
@@ -40,7 +41,8 @@ HEADERS  += src/mainwindow.h \
     src/ChatWidget/resources.h \
     src/ChatWidget/channel.h \
     src/Messages/emotemanager.h \
-    src/ChatWidget/userstate.h
+    src/ChatWidget/userstate.h \
+    src/ChatWidget/resizingtextedit.h
 
 RESOURCES += lib/QDarkStyleSheet/qdarkstyle/style.qrc \
              resources/loginwindow.qrc \
