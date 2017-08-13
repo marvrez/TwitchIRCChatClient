@@ -29,6 +29,7 @@ ChatWidget::ChatWidget(QWidget *parent) :
     this->ui->chatWindow->setContextMenuPolicy(Qt::NoContextMenu);
 
     this->ui->wInput->setFocusPolicy(Qt::ClickFocus);
+    this->ui->chatWindow->setFocusPolicy(Qt::NoFocus);
 
 
     QObject::connect(this->ui->wInput,

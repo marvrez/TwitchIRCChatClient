@@ -53,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->tabBar()->tabButton(0,QTabBar::LeftSide)->resize(0,0);
     ui->tabWidget->setTabsClosable(true);
 
+    ui->tabWidget->tabBar()->setFocusPolicy(Qt::ClickFocus);
+
     //ui->tabWidget->setMovable(true);
 }
 

@@ -60,7 +60,6 @@ void ResizingTextEdit::keyPressEvent(QKeyEvent *event) {
     event->ignore();
 
     if (event->key() == Qt::Key_Tab) {
-        qDebug() << tabChangesFocus();
         QString currentCompletionPrefix = this->textUnderCursor();
 
         if (!currentCompletionPrefix.size()) return;
@@ -141,7 +140,6 @@ void ResizingTextEdit::setCompleter(QCompleter* c) {
 
 void ResizingTextEdit::insertCompletion(const QString& completion) {
     if (this->completer->widget() != this) return;
-    qDebug() << "COMPLETION" << completion;
 
     bool hadSpace = false;
     auto prefix = this->textUnderCursor(&hadSpace);
@@ -150,10 +148,9 @@ void ResizingTextEdit::insertCompletion(const QString& completion) {
 
     if (hadSpace) ++prefixSize;
 
-    QTextCursor cursor = this->textCursor();
+    auto cursor = this->textCursor();
     cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor, prefixSize);
     cursor.insertText(completion);
-    cursor.movePosition(QTextCursor::EndOfWord, QTextCursor::MoveAnchor);
     this->setTextCursor(cursor);
 }
 
