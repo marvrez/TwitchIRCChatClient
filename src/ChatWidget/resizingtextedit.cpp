@@ -1,14 +1,6 @@
 #include "ChatWidget/resizingtextedit.h"
 
 ResizingTextEdit::ResizingTextEdit() {
-    auto sizePolicy = this->sizePolicy();
-    sizePolicy.setHeightForWidth(true);
-    sizePolicy.setVerticalPolicy(QSizePolicy::Preferred);
-    this->setSizePolicy(sizePolicy);
-
-    QObject::connect(this, &QTextEdit::textChanged, this, &QWidget::updateGeometry);
-
-    this->setFocusPolicy(Qt::ClickFocus);
 }
 
 ResizingTextEdit::ResizingTextEdit(QWidget* parent) {
@@ -16,6 +8,7 @@ ResizingTextEdit::ResizingTextEdit(QWidget* parent) {
     sizePolicy.setHeightForWidth(true);
     sizePolicy.setVerticalPolicy(QSizePolicy::Preferred);
     this->setSizePolicy(sizePolicy);
+    this->setAcceptRichText(true);
 
     QObject::connect(this, &QTextEdit::textChanged, this, &QWidget::updateGeometry);
 
@@ -35,29 +28,24 @@ int ResizingTextEdit::heightForWidth(int) const {
     return margins.top() + document()->size().height() + margins.bottom() + 5;
 }
 
-QString ResizingTextEdit::textUnderCursor(bool *hadSpace) const {
-    /*
+QString ResizingTextEdit::textUnderCursor(bool* hadSpace) const {
     auto currentText = this->toPlainText();
 
-    QTextCursor tc = this->textCursor();
+    QTextCursor cursor = this->textCursor();
 
-    auto textUpToCursor = currentText.left(tc.selectionStart());
+    auto textUpToCursor = currentText.left(cursor.selectionStart());
 
     auto words = textUpToCursor.splitRef(' ');
-    if (words.size() == 0) {
-        return QString();
-    }
+    if (words.size() == 0) return QString();
 
     bool first = true;
     QString lastWord;
-    for (auto it = words.crbegin(); it != words.crend(); ++it) {
-        auto word = *it;
+    for (int i = words.size() - 1; i >= 0; --i) {
+        auto word = words.at(i);
 
         if (first && word.isEmpty()) {
             first = false;
-            if (hadSpace != nullptr) {
-                *hadSpace = true;
-            }
+            if (hadSpace != nullptr) *hadSpace = true;
             continue;
         }
 
@@ -65,18 +53,14 @@ QString ResizingTextEdit::textUnderCursor(bool *hadSpace) const {
         break;
     }
 
-    if (lastWord.isEmpty()) {
-        return QString();
-    }
-
-    return lastWord;
-    */
+    return lastWord.isEmpty() ? QString() : lastWord;
 }
 
 void ResizingTextEdit::keyPressEvent(QKeyEvent *event) {
     event->ignore();
 
     if (event->key() == Qt::Key_Tab) {
+        qDebug() << tabChangesFocus();
         QString currentCompletionPrefix = this->textUnderCursor();
 
         if (!currentCompletionPrefix.size()) return;
@@ -99,13 +83,16 @@ void ResizingTextEdit::keyPressEvent(QKeyEvent *event) {
         return;
     }
 
-    if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) && event->modifiers() != Qt::ShiftModifier) {
+    else if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) && event->modifiers() != Qt::ShiftModifier) {
         QString text = this->toPlainText();
-        unsigned size = prevMsg.size();
         if(!text.isEmpty()) prevMsg.append(text);
+
+        unsigned size = prevMsg.size();
         if(size > 1 && prevMsg.at(size - 1) == prevMsg.at(size - 2))
             prevMsg.pop_back();
+
         emit returnPressed();
+
         if (!(event->modifiers() == Qt::ControlModifier)) {
             this->setText(QString());
             prevIndex = 0;
@@ -130,35 +117,31 @@ void ResizingTextEdit::keyPressEvent(QKeyEvent *event) {
         }
     }
 
-    // this resets the selection in the completion list, it should probably only trigger on actual
-    // chat input (space, character) and not on every key input (pressing alt for example)
+    // this resets the selection in the completion list, it should probably only trigger on actual chat input (space, character)
     this->nextCompletion = false;
 
     if (!event->isAccepted())
         QTextEdit::keyPressEvent(event);
 }
 
-void ResizingTextEdit::setCompleter(QCompleter *c)
-{
+void ResizingTextEdit::setCompleter(QCompleter* c) {
     if (this->completer) QObject::disconnect(this->completer, 0, this, 0);
 
     this->completer = c;
-
     if (!this->completer) return;
 
     this->completer->setWidget(this);
     this->completer->setCompletionMode(QCompleter::InlineCompletion);
     this->completer->setCaseSensitivity(Qt::CaseInsensitive);
 
-    /*
     QObject::connect(completer,
                      static_cast<void (QCompleter::*)(const QString &)>(&QCompleter::highlighted),
                      this, &ResizingTextEdit::insertCompletion);
-                     */
 }
 
-void ResizingTextEdit::insertCompletion(const QString &completion) {
+void ResizingTextEdit::insertCompletion(const QString& completion) {
     if (this->completer->widget() != this) return;
+    qDebug() << "COMPLETION" << completion;
 
     bool hadSpace = false;
     auto prefix = this->textUnderCursor(&hadSpace);
@@ -167,10 +150,11 @@ void ResizingTextEdit::insertCompletion(const QString &completion) {
 
     if (hadSpace) ++prefixSize;
 
-    QTextCursor tc = this->textCursor();
-    tc.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor, prefixSize);
-    tc.insertText(completion);
-    this->setTextCursor(tc);
+    QTextCursor cursor = this->textCursor();
+    cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor, prefixSize);
+    cursor.insertText(completion);
+    cursor.movePosition(QTextCursor::EndOfWord, QTextCursor::MoveAnchor);
+    this->setTextCursor(cursor);
 }
 
 QCompleter* ResizingTextEdit::getCompleter() const {

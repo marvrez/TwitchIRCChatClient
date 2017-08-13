@@ -4,6 +4,7 @@
 #include "Messages/message.h"
 #include "channel.h"
 #include "resizingtextedit.h"
+#include "completionmanager.h"
 
 #include <QDialog>
 #include <QWebView>

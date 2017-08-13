@@ -28,8 +28,13 @@ ChatWidget::ChatWidget(QWidget *parent) :
     this->ui->chatWindow->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);//Handle link clicks by yourself
     this->ui->chatWindow->setContextMenuPolicy(Qt::NoContextMenu);
 
-    this->ui->wInput->setFocus();
+    this->ui->wInput->setFocusPolicy(Qt::ClickFocus);
 
+
+    QObject::connect(this->ui->wInput,
+                     &QTextEdit::textChanged,
+                     this->ui->wInput,
+                     &QWidget::updateGeometry);
     QObject::connect(this->ui->chatWindow,
                      &QWebView::linkClicked,
                      this,
@@ -49,6 +54,8 @@ ChatWidget::ChatWidget(QString channelName) : ChatWidget(){
     channel = new Channel(channelName);
     Message::emote_manager.loadBttvChannelEmotes(channelName);
     Message::emote_manager.loadFfzChannelEmotes(channelName);
+    auto completer = new QCompleter(CompletionManager::createModel(channelName));
+    this->ui->wInput->setCompleter(completer);
 }
 
 void ChatWidget::addMessage(Message *msg) {
@@ -128,7 +135,7 @@ void ChatWidget::on_wSend_clicked() {
     }
 
     else
-        MainWindow::write.sendMessage(this->channelName, this->ui->wInput->toPlainText());
+        MainWindow::write.sendMessage(this->channelName, this->ui->wInput->toPlainText().replace('\n', ' '));
 
     this->ui->wInput->clear();
 }
