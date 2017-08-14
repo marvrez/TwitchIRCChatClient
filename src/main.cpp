@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
 
     Resources::load();
     Resources::setChannels();
+    Message::emote_manager.loadTwitchEmotes();
     Message::emote_manager.loadBttvEmotes();
     Message::emote_manager.loadFfzEmotes();
 

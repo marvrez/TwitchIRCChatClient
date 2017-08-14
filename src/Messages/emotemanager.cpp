@@ -17,6 +17,37 @@ FfzEmote::FfzEmote(int _id, QString _code) : id(_id), code(_code) {
     this->regex = QRegularExpression(regex_str);
 }
 
+TwitchEmote::TwitchEmote(int id, QString code) : id(id), code(code) {
+    QString regex_str = QString("(?<![^ ])%1(?![^ ])").arg(QRegularExpression::escape(code));
+    this->regex = QRegularExpression(regex_str);
+}
+
+void EmoteManager::loadTwitchEmotes() {
+    QNetworkAccessManager* nam = new QNetworkAccessManager();
+    QUrl url = QUrl(QString("https://twitchemotes.com/api_cache/v3/global.json"));
+    QNetworkRequest req(url);
+    QNetworkReply* reply = nam->get(req);
+    connect(reply,
+            &QNetworkReply::finished,
+            [=]() {
+            if (reply->error() == QNetworkReply::NetworkError::NoError) {
+                QByteArray data = reply->readAll();
+
+                QJsonDocument jsonDoc(QJsonDocument::fromJson(data));
+                QJsonObject emotes = jsonDoc.object();
+                for(auto emote : emotes) {
+                    const QJsonObject &emote_obj = emote.toObject();
+                    qDebug() << emote_obj;
+                    this->twitchEmotes.push_back(TwitchEmote(emote_obj.value("id").toInt(),
+                                                         emote_obj.value("code").toString()));
+                }
+                qDebug() << "TWITCH GLOBAL EMOTES LOADED";
+                reply->deleteLater();
+                nam->deleteLater();
+            }
+    });
+}
+
 void EmoteManager::loadBttvEmotes() {
     QNetworkAccessManager* nam = new QNetworkAccessManager();
     QUrl url = QUrl(QString("https://api.betterttv.net/2/emotes"));
@@ -171,5 +202,9 @@ QList<BttvEmote> EmoteManager::getBttvEmotes() const {
 
 QList<FfzEmote> EmoteManager::getFfzEmotes() const {
     return ffzEmotes;
+}
+
+QList<TwitchEmote> EmoteManager::getTwitchEmotes() const {
+    return twitchEmotes;
 }
 

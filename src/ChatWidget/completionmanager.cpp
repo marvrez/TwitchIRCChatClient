@@ -14,11 +14,9 @@ CompletionModel* CompletionManager::createModel(const QString& channelName)
     model->emotes.clear();
 
     EmoteManager* manager = &Message::emote_manager;
-    /*
-    for (const auto& m : emoteManager.twitchAccountEmotes)
-        for (const auto& emoteName : m.second.emoteCodes)
-            model->addString(emoteName);
-    */
+
+    auto twitchEmotes = manager->getTwitchEmotes();
+    for (const auto& emote : twitchEmotes) model->addString(emote.code);
 
     auto bttvGlobalEmotes = manager->getBttvEmotes();
     for (const auto& emote : bttvGlobalEmotes) model->addString(emote.code);
