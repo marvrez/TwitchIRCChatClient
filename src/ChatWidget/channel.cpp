@@ -46,7 +46,7 @@ void Channel::loadSubBadges(QString roomID) {
             QVariantMap versionMap = versions.toObject().toVariantMap();
 
             for(auto it = versionMap.constBegin(); it != versionMap.constEnd(); ++it) {
-                    QString link = it.value().toMap().value("image_url_2x").toString();
+                    QString link = it.value().toMap().value("image_url_1x").toString();
                     subBadges.insert(QString("subscriber/%1").arg(it.key()), link);
             }
         });
@@ -106,7 +106,6 @@ void Channel::onMessageReceived(IrcMessage *message) {
 QMap<QString, QString> Channel::getSubBadges(){
     return subBadges;
 }
-
 
 QVariantMap* Channel::getRoomData() {
     if(!roomData.empty())
